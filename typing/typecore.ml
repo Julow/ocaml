@@ -197,6 +197,7 @@ let iter_expression f e =
     | Pexp_tuple el -> List.iter expr el
     | Pexp_construct (_, eo)
     | Pexp_variant (_, eo) -> may expr eo
+    | Pexp_construct_fun _ -> ()
     | Pexp_record (iel, eo) ->
         may expr eo; List.iter (fun (_, e) -> expr e) iel
     | Pexp_open (_, e)
@@ -2530,6 +2531,8 @@ and type_expect_
         exp_env = env }
   | Pexp_construct(lid, sarg) ->
       type_construct env loc lid sarg ty_expected_explained sexp.pexp_attributes
+  | Pexp_construct_fun lid ->
+      type_construct_fun env loc lid ty_expected_explained sexp.pexp_attributes
   | Pexp_variant(l, sarg) ->
       (* Keep sharing *)
       let ty_expected0 = instance ty_expected in
@@ -4134,8 +4137,8 @@ and type_application env funct sargs =
     else
       type_args [] [] ty (instance ty) ty sargs []
 
-and type_construct env loc lid sarg ty_expected_explained attrs =
-  let { ty = ty_expected; explanation } = ty_expected_explained in
+and disambiguate_type_construct env lid ty_expected_explained =
+  let { ty = ty_expected; _ } = ty_expected_explained in
   let opath =
     try
       let (p0, p,_) = extract_concrete_variant env ty_expected in
@@ -4146,10 +4149,13 @@ and type_construct env loc lid sarg ty_expected_explained attrs =
     with Not_found -> None
   in
   let constrs = Typetexp.find_all_constructors env lid.loc lid.txt in
-  let constr =
-    wrap_disambiguate "This variant expression is expected to have"
-      ty_expected_explained
-      (Constructor.disambiguate lid env opath) constrs in
+  wrap_disambiguate "This variant expression is expected to have"
+    ty_expected_explained
+    (Constructor.disambiguate lid env opath) constrs
+
+and type_construct env loc lid sarg ty_expected_explained attrs =
+  let { ty = ty_expected; explanation } = ty_expected_explained in
+  let constr = disambiguate_type_construct env lid ty_expected_explained in
   Env.mark_constructor Env.Positive env (Longident.last lid.txt) constr;
   Builtin_attributes.check_alerts loc constr.cstr_attributes
     constr.cstr_name;
@@ -4177,6 +4183,8 @@ and type_construct env loc lid sarg ty_expected_explained attrs =
     end_def ();
     generalize_structure ty_res;
     with_explanation explanation (fun () ->
+      (* Functional constructor *)
+      (* Functional constructor *)
       unify_exp env {texp with exp_type = instance ty_res}
         (instance ty_expected));
     end_def ();
@@ -4211,6 +4219,30 @@ and type_construct env loc lid sarg ty_expected_explained attrs =
   (* NOTE: shouldn't we call "re" on this final expression? -- AF *)
   { texp with
     exp_desc = Texp_construct(lid, constr, args) }
+
+(* Desugar construct_fun *)
+and type_construct_fun env loc lid ty_expected_explained attrs =
+  let open Ast_helper in
+  let constr = disambiguate_type_construct env lid ty_expected_explained in
+  let ghost_id depth = "x" ^ string_of_int depth in
+  let with_loc txt = Location.{ txt; loc } in
+  let rec wrap_fun exp d =
+    if d = constr.cstr_arity then
+      exp
+    else
+      let pat = Pat.var (with_loc (ghost_id d)) in
+      Pexp_fun (Nolabel, None, pat, Exp.mk (wrap_fun exp (d + 1)))
+  in
+  let args =
+    if constr.cstr_arity = 0 then
+      None
+    else
+      let ghost_arg i = Exp.ident (with_loc (Longident.Lident (ghost_id i))) in
+      Some (Exp.tuple (List.init constr.cstr_arity ghost_arg))
+  in
+  let construct_fun = wrap_fun (Pexp_construct (lid, args)) constr.cstr_arity in
+  let sexp = Exp.mk ~loc ~attrs construct_fun in
+  type_expect_ env sexp ty_expected_explained
 
 (* Typing of statements (expressions whose values are discarded) *)
 

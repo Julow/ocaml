@@ -15,3 +15,4 @@ pr6865.ml
 pr7165.ml
 reloc.ml
 shortcut_ext_attr.ml
+construct_fun.ml

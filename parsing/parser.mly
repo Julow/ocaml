@@ -2236,7 +2236,7 @@ simple_expr:
   | constant
       { Pexp_constant $1 }
   | mkrhs(constr_longident) %prec prec_constant_constructor
-      { Pexp_construct($1, None) }
+      { Pexp_construct_fun($1) }
   | name_tag %prec prec_constant_constructor
       { Pexp_variant($1, None) }
   | op(PREFIXOP) simple_expr

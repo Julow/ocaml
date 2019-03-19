@@ -35396,7 +35396,7 @@ module Tables = struct
             in
             
 # 2239 "parsing/parser.mly"
-      ( Pexp_construct(_1, None) )
+      ( Pexp_construct_fun(_1) )
 # 35401 "parsing/parser.ml"
             
           in
