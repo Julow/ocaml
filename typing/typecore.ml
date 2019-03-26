@@ -3990,7 +3990,7 @@ and type_application env funct sargs =
       type_args [] [] ty (instance ty) ty sargs []
 
 and type_construct env loc lid sarg ty_expected_explained attrs =
-  let { ty = ty_expected; explanation } = ty_expected_explained in
+  let { ty = ty_expected; _ } = ty_expected_explained in
   let opath =
     try
       let (p0, p,_) = extract_concrete_variant env ty_expected in
@@ -4008,13 +4008,21 @@ and type_construct env loc lid sarg ty_expected_explained attrs =
       ty_expected_explained
       (Constructor.disambiguate Env.Positive lid env opath) constrs
   in
-  let sargs =
-    match sarg with
-      None -> []
-    | Some {pexp_desc = Pexp_tuple sel} when
-        constr.cstr_arity > 1 || Builtin_attributes.explicit_arity attrs
-      -> sel
-    | Some se -> [se] in
+  if sarg = None && constr.cstr_arity > 0 then
+    type_construct_fun env loc lid constr ty_expected_explained attrs
+  else
+    let sargs =
+      match sarg with
+        None -> []
+      | Some {pexp_desc = Pexp_tuple sel} when
+          constr.cstr_arity > 1 || Builtin_attributes.explicit_arity attrs
+        -> sel
+      | Some se -> [se]
+    in
+    type_construct_normal env loc lid constr sargs ty_expected_explained attrs
+
+and type_construct_normal env loc lid constr sargs ty_expected_explained attrs =
+  let { ty = ty_expected; explanation } = ty_expected_explained in
   if List.length sargs <> constr.cstr_arity then
     raise(Error(loc, env, Constructor_arity_mismatch
                             (lid.txt, constr.cstr_arity, List.length sargs)));
@@ -4071,6 +4079,43 @@ and type_construct env loc lid sarg ty_expected_explained attrs =
   (* NOTE: shouldn't we call "re" on this final expression? -- AF *)
   { texp with
     exp_desc = Texp_construct(lid, constr, args) }
+
+and type_construct_fun env loc lid constr ty_expected_explained attrs =
+  let open Ast_helper in
+  let with_loc txt = Location.{ txt; loc } in
+  let wrap_fun (label, arg_name) content =
+    let pat = Pat.var (with_loc arg_name) in
+    Exp.fun_ ~loc label None pat content
+  in
+  let wrap_constructor constructor_arg args =
+    let constructor = Exp.construct ~loc ~attrs lid (Some constructor_arg) in
+    List.fold_right wrap_fun args constructor
+  in
+  let exp =
+    match constr.cstr_inlined with
+    | Some { type_kind = Type_record (record_labels, _); _ } ->
+        let label_name ld = Ident.name ld.Types.ld_id in
+        let arg_names = List.map label_name record_labels in
+        let record_field name =
+          let lid = with_loc (Longident.Lident name) in
+          lid, Exp.ident ~loc lid
+        in
+        let record = Exp.record ~loc (List.map record_field arg_names) None in
+        let args = List.map (fun name -> Labelled name, name) arg_names in
+        wrap_constructor record args
+    | _ ->
+        let ghost_name i = "x" ^ string_of_int i in
+        let arg_names = List.init constr.cstr_arity ghost_name in
+        let arg_ident name = Exp.ident (with_loc (Longident.Lident name)) in
+        let constr_arg =
+          match arg_names with
+          | [ arg ] -> arg_ident arg
+          | args -> Exp.tuple ~loc (List.map arg_ident args)
+        in
+        let args = List.map (fun name -> Nolabel, name) arg_names in
+        wrap_constructor constr_arg args
+  in
+  type_expect_ env exp ty_expected_explained
 
 (* Typing of statements (expressions whose values are discarded) *)
 
