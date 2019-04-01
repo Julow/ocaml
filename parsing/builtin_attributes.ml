@@ -284,3 +284,6 @@ let has_unboxed attr =
 
 let has_boxed attr =
   List.exists (check ["ocaml.boxed"; "boxed"]) attr
+
+let surrounded attr =
+  List.exists (check ["ocaml.surrounded"]) attr

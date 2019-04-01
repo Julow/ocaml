@@ -4008,7 +4008,8 @@ and type_construct env loc lid sarg ty_expected_explained attrs =
       ty_expected_explained
       (Constructor.disambiguate Env.Positive lid env opath) constrs
   in
-  if sarg = None && constr.cstr_arity > 0 then
+  if sarg = None && constr.cstr_arity > 0
+      && Builtin_attributes.surrounded attrs then
     type_construct_fun env loc lid constr ty_expected_explained attrs
   else
     let sargs =

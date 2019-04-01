@@ -99,6 +99,12 @@ let reloc_typ ~loc x =
   { x with ptyp_loc = make_loc loc;
            ptyp_loc_stack = push_loc x.ptyp_loc x.ptyp_loc_stack };;
 
+let add_attr ~loc name exp =
+  let attr_loc = make_loc loc in
+  let attr_name = { txt = name; loc = attr_loc } in
+  let attr = { attr_name; attr_payload = PStr []; attr_loc } in
+  { exp with pexp_attributes = attr :: exp.pexp_attributes }
+
 let mkexpvar ~loc (name : string) =
   mkexp ~loc (Pexp_ident(mkrhs (Lident name) loc))
 
@@ -2189,7 +2195,7 @@ expr:
 
 simple_expr:
   | LPAREN seq_expr RPAREN
-      { reloc_exp ~loc:$sloc $2 }
+      { add_attr ~loc:$loc($1) "ocaml.surrounded" (reloc_exp ~loc:$sloc $2) }
   | LPAREN seq_expr error
       { unclosed "(" $loc($1) ")" $loc($3) }
   | LPAREN seq_expr type_constraint RPAREN
