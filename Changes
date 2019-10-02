@@ -24,6 +24,9 @@ Working version
   (Gabriel Scherer and Rodolphe Lepigre,
    review by Jeremy Yallop, Damien Doligez and Frédéric Bour)
 
+- #9005: Add syntax for promoting constructors to functions
+  (Jules Aguillon, review by ...)
+
 ### Runtime system:
 
 - #9119: Make [caml_stat_resize_noexc] compatible with the [realloc]
