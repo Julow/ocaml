@@ -459,20 +459,20 @@ let highlight_quote ppf
         (* Single-line error *)
         Format.fprintf ppf "%s | %s@," line_nb line;
         Format.fprintf ppf "%*s   " (String.length line_nb) "";
-        String.iteri (fun i c ->
+        for i = 0 to rightmost.pos_cnum do
           let pos = line_start_cnum + i in
           if ISet.is_start iset ~pos <> None then
             Format.fprintf ppf "@{<%s>" highlight_tag;
           if ISet.mem iset ~pos then Format.pp_print_char ppf '^'
-          else if pos < rightmost.pos_cnum then begin
+          else if pos < rightmost.pos_cnum && i < String.length line then begin
             (* For alignment purposes, align using a tab for each tab in the
                source code *)
-            if c = '\t' then Format.pp_print_char ppf '\t'
+            if line.[i] = '\t' then Format.pp_print_char ppf '\t'
             else Format.pp_print_char ppf ' '
           end;
           if ISet.is_end iset ~pos <> None then
             Format.fprintf ppf "@}"
-        ) line;
+        done;
         Format.fprintf ppf "@}@,"
     | _ ->
         (* Multi-line error *)
