@@ -824,7 +824,8 @@ let delete_eol_spaces src =
   let stop = loop 0 0 in
   Bytes.sub_string dst 0 stop
 
-let pp_two_columns ?(sep = "|") ?max_lines ppf (lines: (string * string) list) =
+let pp_two_columns ?(sep = "|") ?max_lines ppf
+    (lines: (string * (Format.formatter -> unit)) list) =
   let left_column_size =
     List.fold_left (fun acc (s, _) -> Int.max acc (String.length s)) 0 lines in
   let lines_nb = List.length lines in
@@ -841,7 +842,7 @@ let pp_two_columns ?(sep = "|") ?max_lines ppf (lines: (string * string) list) =
   List.iteri (fun k (line_l, line_r) ->
     if k = ellipsed_first then Format.fprintf ppf "...@,";
     if ellipsed_first <= k && k <= ellipsed_last then ()
-    else Format.fprintf ppf "%*s %s %s@," left_column_size line_l sep line_r
+    else Format.fprintf ppf "%*s %s %t@," left_column_size line_l sep line_r
   ) lines;
   Format.fprintf ppf "@]"
 
