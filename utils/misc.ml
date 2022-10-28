@@ -800,10 +800,13 @@ let pp_two_columns ?(sep = "|") ppf
     (lines: (string * (Format.formatter -> unit)) list) =
   let left_column_size =
     List.fold_left (fun acc (s, _) -> Int.max acc (String.length s)) 0 lines in
+  let sep_length = String.length sep in
   Format.fprintf ppf "@[<v>";
   List.iter (fun (line_l, pp_line_r) ->
-    Format.fprintf ppf "%*s %s %t@," left_column_size line_l sep pp_line_r
-  ) lines;
+      let sep = if String.length line_l = 0 then "" else sep in
+      Format.fprintf ppf "%*s %*s %t@," left_column_size line_l sep_length sep
+        pp_line_r
+    ) lines;
   Format.fprintf ppf "@]"
 
 (* showing configuration and configuration variables *)
