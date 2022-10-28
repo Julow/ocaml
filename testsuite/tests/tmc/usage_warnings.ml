@@ -26,9 +26,12 @@ Please either mark the called function with the [@tail_mod_cons]
 attribute, or mark this call with the [@tailcall false] attribute
 to make its non-tailness explicit.
 Lines 1-3, characters 34-40:
-1 | ..................................function
+1 | let[@tail_mod_cons] rec flatten = function
+                                      ^^^^^^^^
 2 |   | [] -> []
+      ^^^^^^^^^^
 3 |   | xs :: xss -> append xs (flatten xss)
+      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Warning 71 [unused-tmc-attribute]: This function is marked @tail_mod_cons
 but is never applied in TMC position.
 val flatten : 'a list list -> 'a list = <fun>
@@ -70,16 +73,26 @@ Please either mark the called function with the [@tail_mod_cons]
 attribute, or mark this call with the [@tailcall false] attribute
 to make its non-tailness explicit.
 Lines 1-10, characters 34-30:
- 1 | ..................................function
+ 1 | let[@tail_mod_cons] rec flatten = function
+                                       ^^^^^^^^
  2 |   | [] -> []
+       ^^^^^^^^^^
  3 |   | xs :: xss ->
+       ^^^^^^^^^^^^^^
  4 |       let rec append_flatten xs xss =
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
  5 |         match xs with
+             ^^^^^^^^^^^^^
  6 |         | [] -> flatten xss
+             ^^^^^^^^^^^^^^^^^^^
  7 |         | x :: xs ->
+             ^^^^^^^^^^^^
  8 |             (* incorrect: this call to append_flatten is not transformed *)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
  9 |             x :: append_flatten xs xss
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 10 |       in append_flatten xs xss
+           ^^^^^^^^^^^^^^^^^^^^^^^^
 Warning 71 [unused-tmc-attribute]: This function is marked @tail_mod_cons
 but is never applied in TMC position.
 val flatten : 'a list list -> 'a list = <fun>
@@ -156,10 +169,14 @@ module Tail_calls_to_non_specialized_functions = struct
 end
 [%%expect {|
 Lines 20-23, characters 10-27:
-20 | ..........list_id
+20 |           list_id
+               ^^^^^^^
 21 |             (* no [@tailcall false]: this should warn that
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 22 |                the call becomes non-tailcall in the TMC version. *)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 23 |             (filter_1 f xs)
+                 ^^^^^^^^^^^^^^^
 Warning 72 [tmc-breaks-tailcall]: This call
 is in tail-modulo-cons positionin a TMC function,
 but the function called is not itself specialized for TMC,

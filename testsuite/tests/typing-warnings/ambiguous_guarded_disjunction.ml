@@ -208,8 +208,10 @@ let ambiguous__first_orpat = function
 ;;
 [%%expect {|
 Lines 2-3, characters 4-58:
-2 | ....`A ((`B (Some x, _) | `B (_, Some x)),
-3 |         (`C (Some y, Some _, _) | `C (Some y, _, Some _))).................
+2 |   | `A ((`B (Some x, _) | `B (_, Some x)),
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+3 |         (`C (Some y, Some _, _) | `C (Some y, _, Some _))) when x < y -> ()
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Warning 57 [ambiguous-var-in-pattern-guard]: Ambiguous or-pattern variables under guard;
 variable x appears in different places in different or-pattern alternatives.
 Only the first match will be used to evaluate the guard expression.
@@ -228,8 +230,10 @@ let ambiguous__second_orpat = function
 ;;
 [%%expect {|
 Lines 2-3, characters 4-42:
-2 | ....`A ((`B (Some x, Some _, _) | `B (Some x, _, Some _)),
-3 |         (`C (Some y, _) | `C (_, Some y))).................
+2 |   | `A ((`B (Some x, Some _, _) | `B (Some x, _, Some _)),
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+3 |         (`C (Some y, _) | `C (_, Some y))) when x < y -> ()
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Warning 57 [ambiguous-var-in-pattern-guard]: Ambiguous or-pattern variables under guard;
 variable y appears in different places in different or-pattern alternatives.
 Only the first match will be used to evaluate the guard expression.
@@ -323,8 +327,10 @@ let ambiguous__amoi a = match a with
 ;;
 [%%expect {|
 Lines 2-3, characters 2-17:
-2 | ..X (Z x,Y (y,0))
+2 | | X (Z x,Y (y,0))
+      ^^^^^^^^^^^^^^^
 3 | | X (Z y,Y (x,_))
+    ^^^^^^^^^^^^^^^^^
 Warning 57 [ambiguous-var-in-pattern-guard]: Ambiguous or-pattern variables under guard;
 variables x, y appear in different places in different or-pattern alternatives.
 Only the first match will be used to evaluate the guard expression.
@@ -345,8 +351,10 @@ let ambiguous__module_variable x b =  match x with
 ;;
 [%%expect {|
 Lines 2-3, characters 4-24:
-2 | ....(module M:S),_,(1,_)
-3 |   | _,(module M:S),(_,1)...................
+2 |   | (module M:S),_,(1,_)
+        ^^^^^^^^^^^^^^^^^^^^
+3 |   | _,(module M:S),(_,1) when M.b && b -> 1
+      ^^^^^^^^^^^^^^^^^^^^^^
 Warning 57 [ambiguous-var-in-pattern-guard]: Ambiguous or-pattern variables under guard;
 variable M appears in different places in different or-pattern alternatives.
 Only the first match will be used to evaluate the guard expression.
@@ -388,9 +396,12 @@ Line 2, characters 4-5:
 Warning 41 [ambiguous-name]: A belongs to several types: t2 t
 The first one was selected. Please disambiguate if this is wrong.
 Lines 1-3, characters 41-10:
-1 | .........................................function
+1 | let ambiguous_xy_but_not_ambiguous_z g = function
+                                             ^^^^^^^^
 2 |   | A (x as z,(0 as y))|A (0 as y as z,x)|B (x,(y as z)) when g x (y+z) -> 1
+      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 3 |   | _ -> 2
+      ^^^^^^^^
 Warning 4 [fragile-match]: this pattern-matching is fragile.
 It will remain exhaustive when constructors are added to type t2.
 Line 2, characters 4-56:
@@ -419,9 +430,12 @@ Line 2, characters 42-43:
 Warning 41 [ambiguous-name]: B belongs to several types: t2 t
 The first one was selected. Please disambiguate if this is wrong.
 Lines 1-3, characters 41-10:
-1 | .........................................function
+1 | let ambiguous_xy_but_not_ambiguous_z g = function
+                                             ^^^^^^^^
 2 |   | A (x as z,(0 as y))|A (0 as y as z,x)|B (x,(y as z)) when g x (y+z) -> 1
+      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 3 |   | _ -> 2
+      ^^^^^^^^
 Warning 4 [fragile-match]: this pattern-matching is fragile.
 It will remain exhaustive when constructors are added to type t2.
 Line 2, characters 4-56:

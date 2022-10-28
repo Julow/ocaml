@@ -119,10 +119,14 @@ module A = struct
 end
 [%%expect{|
 Lines 3-6, characters 4-7:
-3 | ....open struct
+3 |     open struct
+        ^^^^^^^^^^^
 4 |       type t = T
+          ^^^^^^^^^^
 5 |       let x = T
+          ^^^^^^^^^
 6 |     end
+        ^^^
 Error: The type t/343 introduced by this open appears in the signature
        Line 7, characters 8-9:
          The value y has no valid type if t/343 is hidden
@@ -139,9 +143,12 @@ module A = struct
 end
 [%%expect{|
 Lines 3-5, characters 4-7:
-3 | ....open struct
+3 |     open struct
+        ^^^^^^^^^^^
 4 |       type t = T
+          ^^^^^^^^^^
 5 |     end
+        ^^^
 Error: The type t/348 introduced by this open appears in the signature
        Line 6, characters 8-9:
          The value y has no valid type if t/348 is hidden
