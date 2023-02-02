@@ -62,9 +62,7 @@ let print_type_scheme ppf t =
     Printtyp.shared_type_scheme ppf t
 
 let print_type_param decl ppf (param,v) =
-  (* HACK: we print type parameters as type expressions, and amend ["'_"] to ["_"] *)
   let ty = Format.asprintf "%a" Printtyp.shared_type_scheme param in
-  let ty = if ty = "'_" then "_" else ty in
   let var = string_of_variance decl v in
   if need_parent param then
     Format.fprintf  ppf "(%s%s)" var ty

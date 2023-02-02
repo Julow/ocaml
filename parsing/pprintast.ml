@@ -272,9 +272,11 @@ let tyvar ppf s =
   if String.length s >= 2 && s.[1] = '\'' then
     (* without the space, this would be parsed as
        a character literal *)
-    Format.fprintf ppf "' %s" s
+    pp ppf "' %s" s
+  else if s = "_" then
+    pp ppf "_"
   else
-    Format.fprintf ppf "'%s" s
+    pp ppf "'%s" s
 
 let tyvar_loc f str = tyvar f str.txt
 let string_quot f x = pp f "`%s" x
