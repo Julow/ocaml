@@ -521,13 +521,17 @@ val print_if :
   Format.formatter -> bool ref -> (Format.formatter -> 'a -> unit) -> 'a -> 'a
 (** [print_if ppf flag fmt x] prints [x] with [fmt] on [ppf] if [b] is true. *)
 
+val ellipse : ellipsis:'a -> max_lines:int -> 'a list -> 'a list
+(** [ellipse ~ellipsis ~max_lines lines] returns [lines] if its length is less
+    than [max_lines], otherwise, remove the middle lines until its length is
+    equal to [max_lines]. If a line has been removed, [ellipsis] is inserted in
+    the middle and is counted as a line. *)
+
 val pp_two_columns :
-  ?sep:string -> ?max_lines:int -> Format.formatter ->
+  ?sep:string -> Format.formatter ->
   (string * (Format.formatter -> unit)) list -> unit
-(** [pp_two_columns ?sep ?max_lines ppf l] prints the lines in [l] as two
-   columns separated by [sep] ("|" by default). [max_lines] can be used to
-   indicate a maximum number of lines to print -- an ellipsis gets inserted at
-   the middle if the input has too many lines.
+(** [pp_two_columns ?sep ppf l] prints the lines in [l] as two columns
+    separated by [sep] ("|" by default).
 
    Example:
 

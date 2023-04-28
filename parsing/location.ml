@@ -380,7 +380,7 @@ let highlight_terminfo lb ppf locs =
    There are two different styles for highlighting errors in "dumb" mode,
    depending if the error fits on a single line or spans across several lines.
 
-   For single-line errors,
+   The error
 
      foo the_error bar
 
@@ -389,19 +389,9 @@ let highlight_terminfo lb ppf locs =
      X | foo the_error bar
              ^^^^^^^^^
 
-
-   For multi-line errors,
-
-     foo the_
-     error bar
-
-   gets displayed as:
-
-     X1 | ....the_
-     X2 | error....
-
-   An ellipsis hides the middle lines of the multi-line error if it has more
-   than [max_lines] lines.
+   For multi-line errors, every line are displayed as above. An ellipsis hides
+   the middle lines of the multi-line error if it has more than [max_lines]
+   lines.
 
    If [locs] is empty then this function is a no-op.
 *)
@@ -410,6 +400,13 @@ type input_line = {
   text : string;
   start_pos : int;
 }
+
+let count_indentation s =
+  let rec loop s i =
+    if i >= String.length s then i
+    else match s.[i] with ' ' | '\t' -> loop s (i + 1) | _ -> i
+  in
+  loop s 0
 
 let mk_span a b = ((), a), ((), max a b)
 
@@ -459,7 +456,7 @@ let highlight_quote ppf
               lines
             |> List.fold_left (fun (spans, bol) (line, _, _) ->
                 let eol = bol + String.length line in
-                let begin_ = max a_cnum bol
+                let begin_ = max a_cnum (bol + count_indentation line)
                 and end_ =
                   (* Avoid highlighting the ends of lines when the range spans
                      several lines. It's still possible to highlight the end of
@@ -475,12 +472,11 @@ let highlight_quote ppf
             |> List.rev
           ) intervals
       in
-      (* Print a line of code followed by a line with highlighting markers [^].
-       *)
-      let highlight_line ppf (line, line_nb, line_start_cnum) =
+      (* Print highlighting markers [^]. *)
+      let highlight_line line line_start_cnum ppf =
         let line_end_cnum = line_start_cnum + String.length line in
-        let rec segments ppf pos =
-          match ISet.find_interval_in iset ~range:(pos, line_end_cnum + 1) with
+        let rec segments pos =
+          match ISet.find_interval_in iset ~range:(pos, line_end_cnum) with
           | None -> ()
           | Some (((), start), ((), end_)) ->
               (* [start] is guaranteed to be within the line due to the split *)
@@ -490,50 +486,25 @@ let highlight_quote ppf
               done;
               Format.fprintf ppf "@{<%s>%s@}" highlight_tag
                 (String.make (end_ - start + 1) '^');
-              segments ppf (end_ + 1)
+              segments (end_ + 1)
         in
-        Format.fprintf ppf "%d | @[<v>%s@,%a@]@,"
-          line_nb line segments line_start_cnum
+        segments line_start_cnum
       in
-      (* Replace parts of the line that are outside of intervals with ellipsis.
-         Output suitable for {!Misc.pp_two_columns}. *)
-      let ellipsisise_line (line_txt, line_nb, line_start_cnum) =
-        let line_end_cnum = line_start_cnum + String.length line_txt in
-        let rec pp_ranges pos ppf =
-          match ISet.find_interval_in iset ~range:(pos, line_end_cnum) with
-          | None ->
-              for _ = pos to line_end_cnum - 1 do
-                Format.pp_print_char ppf '.'
-              done;
-              ()
-          | Some (((), start), ((), end_)) ->
-              for _ = pos to start - 1 do
-                Format.pp_print_char ppf '.'
-              done;
-              let range_txt =
-                let len = min line_end_cnum (end_ + 1) - start in
-                String.sub line_txt (start - line_start_cnum) len
-              in
-              Format.pp_print_string ppf range_txt;
-              pp_ranges (end_ + 1) ppf
-        in
-        Int.to_string line_nb, pp_ranges line_start_cnum
-      in
-      Format.fprintf ppf "@[<v>";
       begin match lines with
-        | [] | [("", _, _)] -> ()
-        | [line] ->
-            (* Single-line error. Range is highlighted using a line of [^]. *)
-            highlight_line ppf line
-        | lines ->
-            (* Multi-line error. First and last lines are truncated to exactly
-               represent the range. Lines in the middle can be ellipsised until
-               there are no more than [max_lines]. *)
+      | [] | [("", _, _)] -> ()
+      | lines ->
+          let pp_ellipsis ppf = Format.fprintf ppf "..." in
+          let highlighted_lines =
             lines
-            |> List.map ellipsisise_line
-            |> Misc.pp_two_columns ~max_lines ~sep:"|" ppf
-      end;
-      Format.fprintf ppf "@]"
+            |> List.map (fun (line, line_nb, line_start_cnum) ->
+                [ (Int.to_string line_nb, Fun.flip Format.pp_print_string line);
+                  ("", highlight_line line line_start_cnum) ])
+            |> Misc.ellipse ~ellipsis:[ "", pp_ellipsis ] ~max_lines
+            |> List.concat
+          in
+          Format.fprintf ppf "@[<v>%a@]" (Misc.pp_two_columns ~sep:"|")
+            highlighted_lines
+      end
 
 let lines_around
     ~(start_pos: position) ~(end_pos: position)
