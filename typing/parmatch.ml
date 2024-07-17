@@ -811,9 +811,10 @@ end
 
 (* build a pattern from a constructor description *)
 let pat_of_constr ex_pat cstr =
+  let lid = Longident.Lident (Ident.name cstr.cstr_id) in
   {ex_pat with pat_desc =
-   Tpat_construct (mknoloc (Longident.Lident cstr.cstr_name),
-                   cstr, omegas cstr.cstr_arity, None)}
+   Tpat_construct (mknoloc lid, cstr, omegas cstr.cstr_arity, None)}
+
 
 let orify x y = make_pat (Tpat_or (x, y, None)) x.pat_type x.pat_env
 
@@ -865,7 +866,7 @@ let get_variant_constructors env ty =
 
 module ConstructorSet = Set.Make(struct
   type t = constructor_description
-  let compare c1 c2 = String.compare c1.cstr_name c2.cstr_name
+  let compare c1 c2 = Ident.compare c1.cstr_id c2.cstr_id
 end)
 
 (* Sends back a pattern that complements the given constructors used_constrs *)

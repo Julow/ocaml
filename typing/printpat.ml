@@ -20,9 +20,10 @@ open Typedtree
 open Types
 open Format_doc
 
-let is_cons = function
-| {cstr_name = "::"} -> true
-| _ -> false
+let is_cons cstr =
+  match Ident.name cstr.cstr_id with
+  |  "::" -> true
+  | _ -> false
 
 let pretty_const c = match c with
 | Const_int i -> Printf.sprintf "%d" i
@@ -57,11 +58,11 @@ let rec pretty_val : type k . _ -> k general_pattern -> _ = fun ppf v ->
   | Tpat_tuple vs ->
       fprintf ppf "@[(%a)@]" (pretty_vals ",") vs
   | Tpat_construct (_, cstr, [], _) ->
-      fprintf ppf "%s" cstr.cstr_name
+      fprintf ppf "%s" (Ident.name cstr.cstr_id)
   | Tpat_construct (_, cstr, [w], None) ->
-      fprintf ppf "@[<2>%s@ %a@]" cstr.cstr_name pretty_arg w
+      fprintf ppf "@[<2>%s@ %a@]" (Ident.name cstr.cstr_id) pretty_arg w
   | Tpat_construct (_, cstr, vs, vto) ->
-      let name = cstr.cstr_name in
+      let name = Ident.name cstr.cstr_id in
       begin match (name, vs, vto) with
         ("::", [v1;v2], None) ->
           fprintf ppf "@[%a::@,%a@]" pretty_car v1 pretty_cdr v2

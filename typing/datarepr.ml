@@ -129,7 +129,7 @@ let constructor_descrs ~current_unit ty_path decl cstrs rep =
             Path.(Pextra_ty (ty_path, Pcstr_ty cstr_name)) representation
         in
         let cstr =
-          { cstr_name;
+          { cstr_id = cd_id;
             cstr_res = ty_res;
             cstr_existentials = existentials;
             cstr_args;
@@ -157,7 +157,7 @@ let extension_descr ~current_unit path_ext ext =
     constructor_args ~current_unit ext.ext_private ext.ext_args ext.ext_ret_type
       Path.(Pextra_ty (path_ext, Pext_ty)) (Record_extension path_ext)
   in
-    { cstr_name = Path.last path_ext;
+    { cstr_id = Path.head path_ext;
       cstr_res = ty_res;
       cstr_existentials = existentials;
       cstr_args;

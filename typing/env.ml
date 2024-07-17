@@ -1157,7 +1157,7 @@ and find_cstr path name env =
   let tda = find_type_data path env in
   match tda.tda_descriptions with
   | Type_variant (cstrs, _) ->
-      List.find (fun cstr -> cstr.cstr_name = name) cstrs
+      List.find (fun cstr -> Ident.name cstr.cstr_id = name) cstrs
   | Type_record _ | Type_abstract _ | Type_open -> raise Not_found
 
 
@@ -1750,7 +1750,7 @@ let rec components_of_module_maker
                         cda_shape }
                       in
                       c.comp_constrs <-
-                        add_to_tbl descr.cstr_name cda c.comp_constrs
+                        add_to_tbl (Ident.name descr.cstr_id) cda c.comp_constrs
                     ) cstrs;
                  Type_variant (cstrs, repr)
               | Type_record (_, repr) ->
@@ -1924,7 +1924,7 @@ and store_constructor ~check type_decl type_id cstr_id cstr env =
      && Warnings.is_active (Warnings.Unused_constructor ("", Unused))
   then begin
     let ty_name = Ident.name type_id in
-    let name = cstr.cstr_name in
+    let name = Ident.name cstr.cstr_id in
     let loc = cstr.cstr_loc in
     let k = cstr.cstr_uid in
     let priv = type_decl.type_private in
@@ -2058,7 +2058,7 @@ and store_extension ~check ~rebind id addr ext shape env =
   then begin
     let priv = ext.ext_private in
     let is_exception = Path.same ext.ext_type_path Predef.path_exn in
-    let name = cstr.cstr_name in
+    let name = Ident.name cstr.cstr_id in
     let k = cstr.cstr_uid in
     if not (Types.Uid.Tbl.mem !used_constructors k) then begin
       let used = constructor_usages () in
@@ -2748,7 +2748,8 @@ let use_label ~use ~loc usage env lbl =
 let use_constructor_desc ~use ~loc usage env cstr =
   if use then begin
     mark_constructor_description_used usage env cstr;
-    Builtin_attributes.check_alerts loc cstr.cstr_attributes cstr.cstr_name
+    Builtin_attributes.check_alerts loc cstr.cstr_attributes
+      (Ident.name cstr.cstr_id)
   end
 
 let use_constructor ~use ~loc usage env cda =
@@ -3543,7 +3544,7 @@ let extract_types path env =
 let extract_modules path env =
   fold_modules (fun name _ _ acc -> name :: acc) path env []
 let extract_constructors path env =
-  fold_constructors (fun desc acc -> desc.cstr_name :: acc) path env []
+  fold_constructors (fun desc acc -> Ident.name desc.cstr_id :: acc) path env []
 let extract_labels path env =
   fold_labels (fun desc acc -> desc.lbl_name :: acc) path env []
 let extract_classes path env =

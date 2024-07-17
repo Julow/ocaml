@@ -662,7 +662,7 @@ val item_visibility : signature_item -> visibility
    environments *)
 
 type constructor_description =
-  { cstr_name: string;                  (* Constructor name *)
+  { cstr_id: Ident.t;                   (* Constructor ident *)
     cstr_res: type_expr;                (* Type of the result *)
     cstr_existentials: type_expr list;  (* list of existentials *)
     cstr_args: type_expr list;          (* Type of the arguments *)

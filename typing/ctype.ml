@@ -1333,7 +1333,7 @@ let instance_constructor existential_treatment cstr =
           fun existential ->
             let env = penv.env in
             let fresh_constr_scope = penv.equations_scope in
-            let decl = new_local_type (Existential cstr.cstr_name) in
+            let decl = new_local_type (Existential (Ident.name cstr.cstr_id)) in
             let name = existential_name name_counter existential in
             let (id, new_env) =
               Env.enter_type (get_new_abstract_name env name) decl env

@@ -163,8 +163,8 @@ let iter_on_occurrences
     | { Types.cstr_uid = Predef name; _} ->
         let id = List.assoc name Predef.builtin_idents in
         f ~namespace:Constructor env (Pident id) lid
-    | { Types.cstr_res; cstr_name; _ } ->
-        let path = path_in_type cstr_res cstr_name in
+    | { Types.cstr_res; cstr_id; _ } ->
+        let path = path_in_type cstr_res (Ident.name cstr_id) in
         Option.iter (fun path -> f ~namespace:Constructor env path lid) path
   in
   let add_label env lid { Types.lbl_name; lbl_res; _ } =

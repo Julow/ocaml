@@ -231,7 +231,7 @@ end = struct
       | Tuple n -> Tpat_tuple (omegas n)
       | Array n -> Tpat_array (omegas n)
       | Construct c ->
-          let lid_loc = mkloc (Longident.Lident c.cstr_name) in
+          let lid_loc = mkloc (Longident.Lident (Ident.name c.cstr_id)) in
           Tpat_construct (lid_loc, c, omegas c.cstr_arity, None)
       | Variant { tag; has_arg; cstr_row } ->
           let arg_opt = if has_arg then Some omega else None in

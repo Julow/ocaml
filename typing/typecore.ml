@@ -1496,7 +1496,7 @@ module Constructor = NameChoice (struct
   type t = constructor_description
   type usage = Env.constructor_usage
   let kind = Datatype_kind.Variant
-  let get_name cstr = cstr.cstr_name
+  let get_name cstr = Ident.name cstr.cstr_id
   let get_type cstr = cstr.cstr_res
   let lookup_all_from_type loc usage path env =
     match Env.lookup_all_constructors_from_type ~loc usage path env with
@@ -1805,7 +1805,7 @@ and type_pat_aux
       begin match no_existentials, constr.cstr_existentials with
       | None, _ | _, [] -> ()
       | Some r, (_ :: _) ->
-          let name = constr.cstr_name in
+          let name = Ident.name constr.cstr_id in
           raise (Error (loc, !!penv, Unexpected_existential (r, name)))
       end;
       let sarg', existential_styp =
@@ -3918,7 +3918,9 @@ and type_expect_
           (mk_expected ~explanation:While_loop_conditional Predef.type_bool) in
       let exp_type =
         match cond.exp_desc with
-        | Texp_construct(_, {cstr_name="true"}, _) -> instance ty_expected
+        | Texp_construct(_, {cstr_id}, _)
+          when Ident.equal cstr_id Predef.ident_true ->
+            instance ty_expected
         | _ -> instance Predef.type_unit
       in
       let body = type_statement ~explanation:While_loop_body env sbody in
@@ -4152,7 +4154,8 @@ and type_expect_
           (mk_expected ~explanation:Assert_condition Predef.type_bool) in
       let exp_type =
         match cond.exp_desc with
-        | Texp_construct(_, {cstr_name="false"}, _) ->
+        | Texp_construct(_, {cstr_id}, _)
+          when Ident.equal cstr_id Predef.ident_false ->
             instance ty_expected
         | _ ->
             instance Predef.type_unit
@@ -6836,7 +6839,7 @@ let report_error ~loc env = function
   | Private_constructor (constr, ty) ->
       Location.errorf ~loc
         "Cannot use private constructor %a to create values of type %a"
-        Style.inline_code constr.cstr_name
+        Style.inline_code (Ident.name constr.cstr_id)
         (Style.as_inline_code Printtyp.type_expr) ty
   | Not_a_polymorphic_variant_type lid ->
       Location.errorf ~loc "The type %a@ is not a variant type"
