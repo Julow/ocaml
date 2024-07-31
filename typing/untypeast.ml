@@ -478,7 +478,14 @@ let expression sub exp =
         Pexp_try (sub.expr sub exp, merged_cases)
     | Texp_tuple list ->
         Pexp_tuple (List.map (sub.expr sub) list)
-    | Texp_construct (lid, _, args) ->
+    | Texp_construct (lid, cstr, args) ->
+        let _ = assert false in
+        let lid =
+          if Ident.equal cstr.cstr_id Predef.ident_false
+          || Ident.equal cstr.cstr_id Predef.ident_true
+          then Location.mkloc (Longident.Lident (Ident.name cstr.cstr_id)) lid.loc
+          else lid
+        in
         Pexp_construct (map_loc sub lid,
           (match args with
               [] -> None
