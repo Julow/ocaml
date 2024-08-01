@@ -30,6 +30,9 @@ type t =
   | Ldot of t * string loc
   | Lapply of t * t
 
+val mknoloc : 'a -> 'a loc
+val mkloc : 'a -> Location.t -> 'a loc
+
 (** [same t t'] compares the longidents [t] and [t'] without taking locations
     into account. *)
 val same: t -> t -> bool

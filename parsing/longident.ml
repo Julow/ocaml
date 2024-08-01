@@ -19,6 +19,11 @@ type t =
   | Ldot of t * string loc
   | Lapply of t * t
 
+let not_comparable = Some (fun () -> assert false)
+
+let mknoloc txt = { txt; loc = Location.none; not_comparable }
+let mkloc txt loc = { txt; loc; not_comparable }
+
 let rec same t t' =
   t == t'
   || match t, t' with
