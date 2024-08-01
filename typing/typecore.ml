@@ -4901,10 +4901,8 @@ and type_format loc str env =
         pexp_loc = loc;
         pexp_loc_stack = [];
         pexp_attributes = [];
-      } and mk_lid_loc lid = {
-        txt = lid;
-        loc = loc;
-      } in
+      }
+      and mk_lid_loc lid = Location.mkloc lid loc in
       let mk_constr name args =
         let lid =
           Longident.(Ldot(Lident (mknoloc "CamlinternalFormatBasics"),

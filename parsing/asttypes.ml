@@ -54,6 +54,7 @@ type arg_label =
 type 'a loc = 'a Location.loc = {
   txt : 'a;
   loc : Location.t;
+  not_comparable : (unit -> unit) option
 }
 
 

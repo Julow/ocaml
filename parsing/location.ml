@@ -68,9 +68,13 @@ let get_pos_info pos =
 type 'a loc = {
   txt : 'a;
   loc : t;
+  not_comparable : (unit -> unit) option
 }
 
-let mkloc txt loc = { txt ; loc }
+(* This is comparable. *)
+let not_comparable = None
+
+let mkloc txt loc = { txt ; loc; not_comparable }
 let mknoloc txt = mkloc txt none
 
 (******************************************************************************)
@@ -649,7 +653,7 @@ let lines_around_from_current_input ~start_pos ~end_pos =
 type msg = Fmt.t loc
 
 let msg ?(loc = none) fmt =
-  Fmt.kdoc_printf (fun txt -> { loc; txt }) fmt
+  Fmt.kdoc_printf (fun txt -> { loc; txt; not_comparable }) fmt
 
 type report_kind =
   | Report_error
@@ -785,7 +789,7 @@ let batch_mode_printer : report_printer =
       Format.fprintf ppf "@,%a" (self.pp_submsg self report) msg
     ) msgs
   in
-  let pp_submsg self report ppf { loc; txt } =
+  let pp_submsg self report ppf { loc; txt; _ } =
     Format.fprintf ppf "@[%a  %a@]"
       (self.pp_submsg_loc self report) loc
       (self.pp_submsg_txt self report) txt
@@ -849,7 +853,7 @@ let report_error ppf err =
   print_report ppf err
 
 let mkerror loc sub footnote txt =
-  { kind = Report_error; main = { loc; txt }; sub; footnote=footnote () }
+  { kind = Report_error; main = mkloc txt loc; sub; footnote=footnote () }
 
 let errorf ?(loc = none) ?(sub = []) ?(footnote=Fun.const None) =
   Fmt.kdoc_printf (mkerror loc sub footnote)
@@ -873,12 +877,11 @@ let default_warning_alert_reporter report mk (loc: t) w : report option =
   | `Active { Warnings.id; message; is_error; sub_locs } ->
       let msg_of_str str = Format_doc.Doc.(empty |> string str) in
       let kind = mk is_error id in
-      let main = { loc; txt = msg_of_str message } in
+      let main = mkloc (msg_of_str message) loc in
       let sub = List.map (fun (loc, sub_message) ->
-        { loc; txt = msg_of_str sub_message }
-      ) sub_locs in
+          mkloc (msg_of_str sub_message) loc
+        ) sub_locs in
       Some { kind; main; sub; footnote=None }
-
 
 let default_warning_reporter =
   default_warning_alert_reporter

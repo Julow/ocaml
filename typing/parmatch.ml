@@ -924,7 +924,7 @@ let build_other ext env =
           (* let c = {c with cstr_name = "*extension*"} in *) (* PR#7330 *)
           make_pat
             (Tpat_var (Ident.create_local "*extension*",
-                       {txt="*extension*"; loc = d.pat_loc},
+                       Location.mkloc "*extension*" d.pat_loc,
                        Uid.internal_not_actually_unique))
             Ctype.none Env.empty
       | Construct _ ->

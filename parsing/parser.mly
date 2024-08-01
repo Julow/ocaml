@@ -142,7 +142,7 @@ let mkpatvar ~loc name =
 let ghexp ~loc d = Exp.mk ~loc:(ghost_loc loc) d
 let ghpat ~loc d = Pat.mk ~loc:(ghost_loc loc) d
 let ghtyp ~loc d = Typ.mk ~loc:(ghost_loc loc) d
-let ghloc ~loc d = { txt = d; loc = ghost_loc loc }
+let ghloc ~loc d = Location.mkloc d (ghost_loc loc)
 let ghstr ~loc d = Str.mk ~loc:(ghost_loc loc) d
 let ghsig ~loc d = Sig.mk ~loc:(ghost_loc loc) d
 

@@ -100,7 +100,8 @@ let rec lident_of_path = function
       Longident.Ldot (lident_of_path p, mknoloc s)
   | Path.Pextra_ty (p, _) -> lident_of_path p
 
-let map_loc sub {loc; txt} = {loc = sub.location sub loc; txt}
+let map_loc sub {loc; txt; not_comparable} =
+  {loc = sub.location sub loc; txt; not_comparable}
 
 (** Extract the [n] patterns from the case of a letop *)
 let rec extract_letop_patterns n pat =
@@ -287,7 +288,7 @@ let pattern : type k . _ -> k T.general_pattern -> _ = fun sub pat ->
   let desc =
   match pat with
       { pat_extra=[Tpat_unpack, loc, _attrs]; pat_desc = Tpat_any; _ } ->
-        Ppat_unpack { txt = None; loc  }
+        Ppat_unpack (Location.mkloc None loc)
     | { pat_extra=[Tpat_unpack, _, _attrs];
         pat_desc = Tpat_var (_,name, _); _ } ->
         Ppat_unpack { name with txt = Some name.txt }
@@ -522,7 +523,8 @@ let expression sub exp =
           | Tmeth_ancestor(id, _) -> mkloc (Ident.name id) loc)
     | Texp_new (_path, lid, _) -> Pexp_new (map_loc sub lid)
     | Texp_instvar (_, path, name) ->
-      Pexp_ident ({loc = sub.location sub name.loc ; txt = lident_of_path path})
+        let lid = lident_of_path path and loc = sub.location sub name.loc in
+        Pexp_ident (Location.mkloc lid loc)
     | Texp_setinstvar (_, _path, lid, exp) ->
         Pexp_setinstvar (map_loc sub lid, sub.expr sub exp)
     | Texp_override (_, list) ->
@@ -552,7 +554,7 @@ let expression sub exp =
     | Texp_unreachable ->
         Pexp_unreachable
     | Texp_extension_constructor (lid, _) ->
-        Pexp_extension ({ txt = "ocaml.extension_constructor"; loc },
+        Pexp_extension (Location.mkloc "ocaml.extension_constructor" loc,
                         PStr [ Str.eval ~loc
                                  (Exp.construct ~loc (map_loc sub lid) None)
                              ])

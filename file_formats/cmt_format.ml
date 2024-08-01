@@ -201,7 +201,7 @@ let iter_on_occurrences
                 && loc.loc_end = exp_loc.loc_end ->
             (* In the presence of punning we want to index the label
                 even if it is ghosted *)
-            let lid = { Location.txt; loc = {loc with loc_ghost = false} } in
+            let lid = Location.mkloc txt {loc with loc_ghost = false} in
             add_label exp_env lid label_descr
           | Overridden (lid, _) -> add_label exp_env lid label_descr
           | Kept _ -> ()) fields

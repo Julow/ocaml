@@ -659,7 +659,6 @@ typing/ctype.cmi : \
     typing/types.cmi \
     typing/type_immediacy.cmi \
     typing/path.cmi \
-    parsing/longident.cmi \
     parsing/location.cmi \
     typing/ident.cmi \
     typing/errortrace.cmi \
@@ -1316,6 +1315,7 @@ typing/rawprinttyp.cmo : \
     typing/types.cmi \
     parsing/pprintast.cmi \
     typing/path.cmi \
+    parsing/longident.cmi \
     utils/format_doc.cmi \
     parsing/asttypes.cmi \
     typing/rawprinttyp.cmi
@@ -1323,6 +1323,7 @@ typing/rawprinttyp.cmx : \
     typing/types.cmx \
     parsing/pprintast.cmx \
     typing/path.cmx \
+    parsing/longident.cmx \
     utils/format_doc.cmx \
     parsing/asttypes.cmx \
     typing/rawprinttyp.cmi
@@ -2007,7 +2008,6 @@ typing/types.cmo : \
     typing/path.cmi \
     parsing/parsetree.cmi \
     utils/misc.cmi \
-    parsing/longident.cmi \
     parsing/location.cmi \
     utils/local_store.cmi \
     typing/ident.cmi \
@@ -2021,7 +2021,6 @@ typing/types.cmx : \
     typing/path.cmx \
     parsing/parsetree.cmi \
     utils/misc.cmx \
-    parsing/longident.cmx \
     parsing/location.cmx \
     utils/local_store.cmx \
     typing/ident.cmx \
@@ -2034,7 +2033,6 @@ typing/types.cmi : \
     typing/primitive.cmi \
     typing/path.cmi \
     parsing/parsetree.cmi \
-    parsing/longident.cmi \
     parsing/location.cmi \
     typing/ident.cmi \
     parsing/asttypes.cmi
@@ -7776,6 +7774,7 @@ debugger/debugger_lexer.cmi : \
 debugger/debugger_parser.cmo : \
     debugger/parser_aux.cmi \
     parsing/longident.cmi \
+    parsing/location.cmi \
     debugger/int64ops.cmi \
     debugger/input_handling.cmi \
     debugger/debugcom.cmi \
@@ -7783,6 +7782,7 @@ debugger/debugger_parser.cmo : \
 debugger/debugger_parser.cmx : \
     debugger/parser_aux.cmi \
     parsing/longident.cmx \
+    parsing/location.cmx \
     debugger/int64ops.cmx \
     debugger/input_handling.cmx \
     debugger/debugcom.cmx \
@@ -7801,6 +7801,7 @@ debugger/eval.cmo : \
     debugger/parser_aux.cmi \
     utils/misc.cmi \
     parsing/longident.cmi \
+    parsing/location.cmi \
     bytecomp/instruct.cmi \
     typing/ident.cmi \
     debugger/frames.cmi \
@@ -7822,6 +7823,7 @@ debugger/eval.cmx : \
     debugger/parser_aux.cmi \
     utils/misc.cmx \
     parsing/longident.cmx \
+    parsing/location.cmx \
     bytecomp/instruct.cmx \
     typing/ident.cmx \
     debugger/frames.cmx \

@@ -90,7 +90,8 @@ let map_tuple f1 f2 (x, y) = (f1 x, f2 y)
 let map_tuple3 f1 f2 f3 (x, y, z) = (f1 x, f2 y, f3 z)
 let map_opt f = function None -> None | Some x -> Some (f x)
 
-let map_loc sub {loc; txt} = {loc = sub.location sub loc; txt}
+let map_loc sub {loc; txt; not_comparable} =
+  {loc = sub.location sub loc; txt; not_comparable}
 
 let rec map_loc_lid sub lid =
   let open Longident in
@@ -99,9 +100,9 @@ let rec map_loc_lid sub lid =
   | Ldot (lid, id) -> Ldot (map_loc_lid sub lid, map_loc sub id)
   | Lapply (lid, lid') -> Lapply(map_loc_lid sub lid, map_loc_lid sub lid')
 
-let map_loc_lid sub {loc; txt} =
+let map_loc_lid sub {loc; txt; not_comparable} =
   let txt = map_loc_lid sub txt in
-  map_loc sub {loc; txt}
+  map_loc sub {loc; txt; not_comparable}
 
 module C = struct
   (* Constants *)
@@ -849,18 +850,18 @@ let extension_of_error {kind; main; sub} =
     raise (Invalid_argument "extension_of_error: expected kind Report_error");
   let str_of_msg msg = Format.asprintf "%a" Format_doc.Doc.format msg in
   let extension_of_sub sub =
-    { loc = sub.loc; txt = "ocaml.error" },
+    Location.mkloc "ocaml.error" sub.loc,
     PStr ([Str.eval (Exp.constant
                        (Const.string ~loc:sub.loc (str_of_msg sub.txt)))])
   in
-  { loc = main.loc; txt = "ocaml.error" },
+  Location.mkloc "ocaml.error" main.loc,
   PStr (Str.eval (Exp.constant
                     (Const.string ~loc:main.loc (str_of_msg main.txt))) ::
         List.map (fun msg -> Str.extension (extension_of_sub msg)) sub)
 
 let attribute_of_warning loc s =
   Attr.mk
-    {loc; txt = "ocaml.ppwarning" }
+    (Location.mkloc "ocaml.ppwarning" loc)
     (PStr ([Str.eval ~loc (Exp.constant (Const.string ~loc s))]))
 
 let cookies = ref String.Map.empty
@@ -913,7 +914,7 @@ module PpxContext = struct
 
   let mk fields =
     {
-      attr_name = { txt = "ocaml.ppx.context"; loc = Location.none };
+      attr_name = Location.mknoloc "ocaml.ppx.context";
       attr_payload = Parsetree.PStr [Str.eval (Exp.record fields None)];
       attr_loc = Location.none
     }
@@ -1062,7 +1063,7 @@ let extension_of_exn exn =
   match error_of_exn exn with
   | Some (`Ok error) -> extension_of_error error
   | Some `Already_displayed ->
-      { loc = Location.none; txt = "ocaml.error" }, PStr []
+      Location.mknoloc "ocaml.error", PStr []
   | None -> raise exn
 
 

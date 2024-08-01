@@ -66,6 +66,7 @@ val get_pos_info: Lexing.position -> string * int * int
 type 'a loc = {
   txt : 'a;
   loc : t;
+  not_comparable : (unit -> unit) option
 }
 
 val mknoloc : 'a -> 'a loc

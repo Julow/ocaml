@@ -75,7 +75,8 @@ type mapper =
 let id x = x
 let tuple2 f1 f2 (x, y) = (f1 x, f2 y)
 let tuple3 f1 f2 f3 (x, y, z) = (f1 x, f2 y, f3 z)
-let map_loc sub {loc; txt} = {loc=sub.location sub loc; txt}
+let map_loc sub {loc; txt; not_comparable} =
+  {loc=sub.location sub loc; txt; not_comparable}
 
 let location _sub l = l
 
