@@ -26,9 +26,10 @@
 open Location
 
 type t =
-    Lident of string loc
-  | Ldot of t * string loc
-  | Lapply of t * t
+  [ `Lident of string loc
+  | `Ldot of t * string loc
+  | `Lapply of t * t
+  ]
 
 (** [same t t'] compares the longidents [t] and [t'] without taking locations
     into account. *)

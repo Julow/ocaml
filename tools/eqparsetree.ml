@@ -50,10 +50,10 @@ module Longident = struct
   include Longident
   let rec eq_t : (t * t) -> 'result =
     function
-    | (Lident a0, Lident b0) -> eq_string (a0, b0)
-    | (Ldot (a0, a1), Ldot (b0, b1)) ->
+    | (`Lident a0, Lident b0) -> eq_string (a0, b0)
+    | (`Ldot (a0, a1), Ldot (b0, b1)) ->
       (eq_t (a0, b0)) && (eq_string (a1, b1))
-    | (Lapply (a0, a1), Lapply (b0, b1)) ->
+    | (`Lapply (a0, a1), Lapply (b0, b1)) ->
       (eq_t (a0, b0)) && (eq_t (a1, b1))
     | (_, _) -> false
 end

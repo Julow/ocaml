@@ -28,7 +28,6 @@
 [@@@ocaml.warning "+60"]
 
 open Asttypes
-open Longident
 open Parsetree
 open Ast_helper
 open Docstrings
@@ -95,8 +94,8 @@ let mkcf ~loc ?attrs ?docs d =
 let mkrhs rhs loc = mkloc rhs (make_loc loc)
 let ghrhs rhs loc = mkloc rhs (ghost_loc loc)
 
-let lident name loc = Lident (mkrhs name loc)
-let ldot lid name loc = Ldot (lid, mkrhs name loc)
+let lident name loc = `Lident (mkrhs name loc)
+let ldot lid name loc = `Ldot (lid, mkrhs name loc)
 
 let push_loc x acc =
   if x.Location.loc_ghost
@@ -329,7 +328,7 @@ let bigarray_untuplify = function
 let builtin_arraylike_name loc _ ~assign paren_kind n =
   let opname = if assign then "set" else "get" in
   let opname = if !Clflags.unsafe then "unsafe_" ^ opname else opname in
-  let lident name = Lident (mknoloc name) in
+  let lident name = `Lident (mknoloc name) in
   let prefix = match paren_kind with
     | Paren -> lident "Array"
     | Bracket ->
@@ -341,8 +340,8 @@ let builtin_arraylike_name loc _ ~assign paren_kind n =
          | Two -> "Array2"
          | Three -> "Array3"
          | Many -> "Genarray" in
-       Ldot(lident "Bigarray", mknoloc submodule_name) in
-   ghloc ~loc (Ldot(prefix, mknoloc opname))
+       `Ldot(lident "Bigarray", mknoloc submodule_name) in
+   ghloc ~loc (`Ldot(prefix, mknoloc opname))
 
 let builtin_arraylike_index loc paren_kind index = match paren_kind with
     | Paren | Bracket -> One, [Nolabel, index]
@@ -371,8 +370,8 @@ let user_indexing_operator_name loc (prefix,ext) ~assign paren_kind n =
     let left, right = paren_to_strings paren_kind in
     String.concat "" ["."; ext; left; mid; right; assign] in
   let lid = match prefix with
-    | None -> Lident (mknoloc name)
-    | Some p -> Ldot(p,mknoloc name) in
+    | None -> `Lident (mknoloc name)
+    | Some p -> `Ldot(p,mknoloc name) in
   ghloc ~loc lid
 
 let user_index loc _ index =
@@ -403,7 +402,7 @@ let indexop_unclosed_error loc_s s loc_e =
 
 let lapply ~loc p1 p2 =
   if !Clflags.applicative_functors
-  then Lapply(p1, p2)
+  then `Lapply(p1, p2)
   else raise (Syntaxerr.Error(
                   Syntaxerr.Applicative_path (make_loc loc)))
 
@@ -417,10 +416,10 @@ let loc_last (id : Longident.t Location.loc) : string Location.loc =
   Longident.last id.txt
 
 let loc_lident (id : string Location.loc) : Longident.t Location.loc =
-  loc_map (fun x -> Lident (mkloc x id.loc)) id
+  loc_map (fun x -> `Lident (mkloc x id.loc)) id
 
 let exp_of_longident lid =
-  let lid = loc_map (fun id -> Lident (Longident.last id)) lid in
+  let lid = loc_map (fun id -> `Lident (Longident.last id)) lid in
   Exp.mk ~loc:lid.loc (Pexp_ident lid)
 
 let exp_of_label lbl =
@@ -2607,7 +2606,7 @@ simple_expr:
       { mkinfix $1 $2 $3 }
   | extension
       { Pexp_extension $1 }
-  | od=open_dot_declaration DOT mkrhs(LPAREN RPAREN {Lident (mknoloc "()")})
+  | od=open_dot_declaration DOT mkrhs(LPAREN RPAREN {`Lident (mknoloc "()")})
       { Pexp_open(od, mkexp ~loc:($loc($3)) (Pexp_construct($3, None))) }
   | mod_longident DOT LPAREN seq_expr error
       { unclosed "(" $loc($3) ")" $loc($5) }
@@ -2646,7 +2645,7 @@ simple_expr:
           let tail_exp, _tail_loc = mktailexp $loc($5) $4 in
           mkexp ~loc:($startpos($3), $endpos) tail_exp in
         Pexp_open(od, list_exp) }
-  | od=open_dot_declaration DOT mkrhs(LBRACKET RBRACKET {Lident (mknoloc "[]")})
+  | od=open_dot_declaration DOT mkrhs(LBRACKET RBRACKET {`Lident (mknoloc "[]")})
       { Pexp_open(od, mkexp ~loc:$loc($3) (Pexp_construct($3, None))) }
   | mod_longident DOT
     LBRACKET expr_semi_list error
@@ -2994,9 +2993,9 @@ simple_pattern_not_ident:
       { Ppat_type ($2) }
   | mkrhs(mod_longident) DOT simple_delimited_pattern
       { Ppat_open($1, $3) }
-  | mkrhs(mod_longident) DOT mkrhs(LBRACKET RBRACKET {Lident (mknoloc "[]")})
+  | mkrhs(mod_longident) DOT mkrhs(LBRACKET RBRACKET {`Lident (mknoloc "[]")})
     { Ppat_open($1, mkpat ~loc:$sloc (Ppat_construct($3, None))) }
-  | mkrhs(mod_longident) DOT mkrhs(LPAREN RPAREN {Lident (mknoloc "()")})
+  | mkrhs(mod_longident) DOT mkrhs(LPAREN RPAREN {`Lident (mknoloc "()")})
     { Ppat_open($1, mkpat ~loc:$sloc (Ppat_construct($3, None))) }
   | mkrhs(mod_longident) DOT LPAREN pattern RPAREN
       { Ppat_open ($1, $4) }

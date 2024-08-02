@@ -81,12 +81,12 @@ type contains_gadt =
 
 let wrong_kind_sort_of_constructor (lid : Longident.t) =
   match lid with
-  | Lident {txt="true"; _} | Lident {txt="false"; _}
-  | Ldot(_, {txt="true"; _}) | Ldot(_, {txt="false"; _}) ->
+  | `Lident {txt="true"; _} | `Lident {txt="false"; _}
+  | `Ldot(_, {txt="true"; _}) | `Ldot(_, {txt="false"; _}) ->
       Boolean
-  | Lident {txt="[]"; _} | Lident {txt="::"; _}
-  | Ldot(_, {txt="[]"; _}) | Ldot(_, {txt="::"; _}) -> List
-  | Lident {txt="()"; _} | Ldot(_, {txt="()"; _}) -> Unit
+  | `Lident {txt="[]"; _} | `Lident {txt="::"; _}
+  | `Ldot(_, {txt="[]"; _}) | `Ldot(_, {txt="::"; _}) -> List
+  | `Lident {txt="()"; _} | `Ldot(_, {txt="()"; _}) -> Unit
   | _ -> Constructor
 
 type existential_restriction =
@@ -328,12 +328,12 @@ let mkexp exp_desc exp_type exp_loc exp_env =
   { exp_desc; exp_type; exp_loc; exp_env; exp_extra = []; exp_attributes = [] }
 
 let option_none env ty loc =
-  let lid = Longident.Lident (mknoloc "None") in
+  let lid = `Lident (mknoloc "None") in
   let cnone = Env.find_ident_constructor Predef.ident_none env in
   mkexp (Texp_construct(mknoloc lid, cnone, [])) ty loc env
 
 let option_some env texp =
-  let lid = Longident.Lident (mknoloc "Some") in
+  let lid = `Lident (mknoloc "Some") in
   let csome = Env.find_ident_constructor Predef.ident_some env in
   mkexp ( Texp_construct(mknoloc lid , csome, [texp]) )
     (type_option texp.exp_type) texp.exp_loc texp.exp_env
@@ -1115,7 +1115,7 @@ end) = struct
   let lookup_from_type env type_path usage lid =
     let descrs = lookup_all_from_type lid.loc usage type_path env in
     match lid.txt with
-    | Longident.Lident { txt = name; _ } -> begin
+    | `Lident { txt = name; _ } -> begin
         match
           List.find (fun (nd, _) -> get_name nd = name) descrs
         with
@@ -1395,14 +1395,14 @@ let disambiguate_lid_a_list loc closed env usage expected_type lid_a_list =
     let lbl_list =
       List.map (fun (lid, _) ->
           match lid.txt with
-          | Longident.Ldot _ -> Some (process_label lid)
+          | `Ldot _ -> Some (process_label lid)
           | _ -> None
         ) lid_a_list
     in
     (* Find a module prefix (if any) to qualify unqualified labels *)
     let qual =
       List.find_map (function
-          | {txt = Longident.Ldot (modname, _); _}, _ -> Some modname
+          | {txt = `Ldot (modname, _); _}, _ -> Some modname
           | _ -> None
         ) lid_a_list
     in
@@ -1420,8 +1420,8 @@ let disambiguate_lid_a_list loc closed env usage expected_type lid_a_list =
         | None, (lid, a) ->
             let qual_lid =
               match qual, lid.txt with
-              | Some modname, Longident.Lident s ->
-                  {lid with txt = Longident.Ldot (modname, s)}
+              | Some modname, `Lident s ->
+                  {lid with txt = `Ldot (modname, s)}
               | _ -> lid
             in
             lid, process_label qual_lid, a
@@ -2092,7 +2092,7 @@ let add_module_variables env module_variables =
           Ast_helper.(
             Mod.unpack ~loc:mv_loc
               (Exp.ident ~loc:mv_name.loc
-                  (mkloc (Longident.Lident mv_name)
+                  (mkloc (`Lident mv_name)
                     mv_name.loc)))
       in
       let pres =
@@ -3335,16 +3335,16 @@ and type_expect_
         | Val_ivar (_, cl_num) ->
             let (self_path, _) =
               Env.find_value_by_name
-                (Longident.Lident (mknoloc ("self-" ^ cl_num))) env
+                (`Lident (mknoloc ("self-" ^ cl_num))) env
             in
             Texp_instvar(self_path, path,
                          match lid.txt with
-                             Longident.Lident id -> { id with loc = lid.loc }
+                             `Lident id -> { id with loc = lid.loc }
                            | _ -> assert false)
         | Val_self (_, _, _, cl_num) ->
             let (path, _) =
               Env.find_value_by_name
-                (Longident.Lident (mknoloc ("self-" ^ cl_num))) env
+                (`Lident (mknoloc ("self-" ^ cl_num))) env
             in
             Texp_ident(path, lid, desc)
         | _ ->
@@ -4038,7 +4038,7 @@ and type_expect_
           in
           let (path_self, _) =
             Env.find_value_by_name
-              (Longident.Lident (mknoloc ("self-" ^ cl_num))) env
+              (`Lident (mknoloc ("self-" ^ cl_num))) env
           in
           rue {
             exp_desc = Texp_setinstvar(path_self, path, lab, newval);
@@ -4061,8 +4061,8 @@ and type_expect_
         [] in
       begin match
         try
-          Env.find_value_by_name (Longident.Lident (mknoloc "selfpat-*")) env,
-          Env.find_value_by_name (Longident.Lident (mknoloc "self-*")) env
+          Env.find_value_by_name (`Lident (mknoloc "selfpat-*")) env,
+          Env.find_value_by_name (`Lident (mknoloc "self-*")) env
         with Not_found ->
           raise(Error(loc, env, Outside_class))
       with
@@ -4583,7 +4583,7 @@ and type_ident env ?(recarg=Rejected) lid =
 
 and type_binding_op_ident env s =
   let loc = s.loc in
-  let lid = Location.mkloc (Longident.Lident s) loc in
+  let lid = Location.mkloc (`Lident s) loc in
   let path, desc = type_ident env lid in
   let path =
     match desc.val_kind with
@@ -4592,7 +4592,7 @@ and type_binding_op_ident env s =
     | Val_self (_, _, _, cl_num) ->
         let path, _ =
           Env.find_value_by_name (
-            Longident.Lident (mknoloc ("self-" ^ cl_num))) env
+            `Lident (mknoloc ("self-" ^ cl_num))) env
         in
         path
     | _ -> path
@@ -4907,7 +4907,7 @@ and type_format loc str env =
       } in
       let mk_constr name args =
         let lid =
-          Longident.(Ldot(Lident (mknoloc "CamlinternalFormatBasics"),
+          (`Ldot(`Lident (mknoloc "CamlinternalFormatBasics"),
                           mknoloc name))
         in
         let arg = match args with
@@ -4988,10 +4988,10 @@ and type_format loc str env =
         | Token_counter -> mk_constr "Token_counter" []
       and mk_int_opt n_opt = match n_opt with
         | None ->
-          let lid_loc = mk_lid_loc (Longident.Lident (mkloc "None" loc)) in
+          let lid_loc = mk_lid_loc (`Lident (mkloc "None" loc)) in
           mk_exp_loc (Pexp_construct (lid_loc, None))
         | Some n ->
-          let lid_loc = mk_lid_loc (Longident.Lident (mkloc "Some" loc)) in
+          let lid_loc = mk_lid_loc (`Lident (mkloc "Some" loc)) in
           mk_exp_loc (Pexp_construct (lid_loc, Some (mk_int n)))
       and mk_fmtty : type a b c d e f g h i j k l .
           (a, b, c, d, e, f, g, h, i, j, k, l) fmtty_rel -> Parsetree.expression
@@ -5251,7 +5251,7 @@ and type_argument ?explanation ?recarg env sarg ty_expected' ty_expected =
         {exp_type = ty; exp_loc = Location.none; exp_env = exp_env;
          exp_extra = []; exp_attributes = [];
          exp_desc =
-         Texp_ident(Path.Pident id, mknoloc (Longident.Lident (mknoloc name)), desc)}
+         Texp_ident(Path.Pident id, mknoloc (`Lident (mknoloc name)), desc)}
       in
       let eta_pat, eta_var = var_pair "eta" ty_arg in
       let func texp =
@@ -6134,7 +6134,7 @@ and type_let_def_wrap_warnings
     match spat_sexp_list with
     | [{pvb_expr={pexp_desc=Pexp_match(
            {pexp_desc=Pexp_ident(
-               { txt = Longident.Lident { txt = "*opt*"; _ }})},_)}}] ->
+               { txt = `Lident { txt = "*opt*"; _ }})},_)}}] ->
         true (* the fake let-declaration introduced by fun ?(x = e) -> ... *)
     | _ ->
         false
@@ -6342,7 +6342,7 @@ and type_send env loc explanation e met =
         let typ = Btype.method_type met sign in
         let (self_path, _) =
           Env.find_value_by_name
-            (Longident.Lident (mknoloc ("self-" ^ cl_num))) env
+            (`Lident (mknoloc ("self-" ^ cl_num))) env
         in
         Tmeth_ancestor(id, self_path), typ
     | _ ->

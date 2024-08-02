@@ -18,7 +18,6 @@
 open Cmi_format
 open Misc
 open Asttypes
-open Longident
 open Path
 open Types
 
@@ -2763,7 +2762,7 @@ let lookup_ident_module (type a) (load : a load) ~errors ~use ~loc s env =
     match find_name_module ~mark:use s.txt env.modules with
     | res -> res
     | exception Not_found ->
-        may_lookup_error errors loc env (Unbound_module (Lident s))
+        may_lookup_error errors loc env (Unbound_module (`Lident s))
   in
   match data with
   | Mod_local mda -> begin
@@ -2785,7 +2784,7 @@ let lookup_ident_module (type a) (load : a load) ~errors ~use ~loc s env =
               use_module ~use ~loc path mda;
               path, (mda : a)
           | exception Not_found ->
-              may_lookup_error errors loc env (Unbound_module (Lident s))
+              may_lookup_error errors loc env (Unbound_module (`Lident s))
         end
     end
 
@@ -2795,9 +2794,9 @@ let lookup_ident_value ~errors ~use ~loc name env =
       use_value ~use ~loc path vda;
       path, vda.vda_description
   | (_, Val_unbound reason) ->
-      report_value_unbound ~errors ~loc env reason (Lident name)
+      report_value_unbound ~errors ~loc env reason (`Lident name)
   | exception Not_found ->
-      may_lookup_error errors loc env (Unbound_value (Lident name, No_hint))
+      may_lookup_error errors loc env (Unbound_value (`Lident name, No_hint))
 
 let lookup_ident_type ~errors ~use ~loc s env =
   match IdTbl.find_name wrap_identity ~mark:use s.txt env.types with
@@ -2805,7 +2804,7 @@ let lookup_ident_type ~errors ~use ~loc s env =
       use_type ~use ~loc path data;
       res
   | exception Not_found ->
-      may_lookup_error errors loc env (Unbound_type (Lident s))
+      may_lookup_error errors loc env (Unbound_type (`Lident s))
 
 let lookup_ident_modtype ~errors ~use ~loc s env =
   match IdTbl.find_name wrap_identity ~mark:use s.txt env.modtypes with
@@ -2813,7 +2812,7 @@ let lookup_ident_modtype ~errors ~use ~loc s env =
       use_modtype ~use ~loc path data.mtda_declaration;
       (path, data.mtda_declaration)
   | exception Not_found ->
-      may_lookup_error errors loc env (Unbound_modtype (Lident s))
+      may_lookup_error errors loc env (Unbound_modtype (`Lident s))
 
 let lookup_ident_class ~errors ~use ~loc s env =
   match IdTbl.find_name wrap_identity ~mark:use s.txt env.classes with
@@ -2821,7 +2820,7 @@ let lookup_ident_class ~errors ~use ~loc s env =
       use_class ~use ~loc path clda;
       path, clda.clda_declaration
   | exception Not_found ->
-      may_lookup_error errors loc env (Unbound_class (Lident s))
+      may_lookup_error errors loc env (Unbound_class (`Lident s))
 
 let lookup_ident_cltype ~errors ~use ~loc s env =
   match IdTbl.find_name wrap_identity ~mark:use s.txt env.cltypes with
@@ -2829,11 +2828,11 @@ let lookup_ident_cltype ~errors ~use ~loc s env =
       use_cltype ~use ~loc path cltda.cltda_declaration;
       path, cltda.cltda_declaration
   | exception Not_found ->
-      may_lookup_error errors loc env (Unbound_cltype (Lident s))
+      may_lookup_error errors loc env (Unbound_cltype (`Lident s))
 
 let lookup_all_ident_labels ~errors ~use ~loc usage s env =
   match TycompTbl.find_all ~mark:use s.txt env.labels with
-  | [] -> may_lookup_error errors loc env (Unbound_label (Lident s))
+  | [] -> may_lookup_error errors loc env (Unbound_label (`Lident s))
   | lbls -> begin
       List.map
         (fun (lbl, use_fn) ->
@@ -2847,7 +2846,7 @@ let lookup_all_ident_labels ~errors ~use ~loc usage s env =
 
 let lookup_all_ident_constructors ~errors ~use ~loc usage s env =
   match TycompTbl.find_all ~mark:use s.txt env.constrs with
-  | [] -> may_lookup_error errors loc env (Unbound_constructor (Lident s))
+  | [] -> may_lookup_error errors loc env (Unbound_constructor (`Lident s))
   | cstrs ->
       List.map
         (fun (cda, use_fn) ->
@@ -2860,13 +2859,13 @@ let lookup_all_ident_constructors ~errors ~use ~loc usage s env =
 
 let rec lookup_module_components ~errors ~use ~loc lid env =
   match lid with
-  | Lident s ->
+  | `Lident s ->
       let path, data = lookup_ident_module Load ~errors ~use ~loc s env in
       path, data.mda_components
-  | Ldot(l, s) ->
+  | `Ldot(l, s) ->
       let path, data = lookup_dot_module ~errors ~use ~loc l s env in
       path, data.mda_components
-  | Lapply _ as lid ->
+  | `Lapply _ as lid ->
       let f_path, f_comp, arg = lookup_apply ~errors ~use ~loc lid env in
       let comps =
         !components_of_functor_appl' ~loc ~f_path ~f_comp ~arg env in
@@ -2900,9 +2899,9 @@ and get_functor_components ~errors ~loc lid env comps =
 
 and lookup_all_args ~errors ~use ~loc lid0 env =
   let rec loop_lid_arg args = function
-    | Lident _ | Ldot _ as f_lid ->
+    | `Lident _ | `Ldot _ as f_lid ->
         (f_lid, args)
-    | Lapply (f_lid, arg_lid) ->
+    | `Lapply (f_lid, arg_lid) ->
         let arg_path, arg_md = lookup_module ~errors ~use ~loc arg_lid env in
         loop_lid_arg ((f_lid,arg_path,arg_md.md_type)::args) f_lid
   in
@@ -2948,15 +2947,15 @@ and lookup_apply ~errors ~use ~loc lid0 env =
 
 and lookup_module ~errors ~use ~loc lid env =
   match lid with
-  | Lident s ->
+  | `Lident s ->
       let path, data = lookup_ident_module Load ~errors ~use ~loc s env in
       let md = Subst.Lazy.force_module_decl data.mda_declaration in
       path, md
-  | Ldot(l, s) ->
+  | `Ldot(l, s) ->
       let path, data = lookup_dot_module ~errors ~use ~loc l s env in
       let md = Subst.Lazy.force_module_decl data.mda_declaration in
       path, md
-  | Lapply _ as lid ->
+  | `Lapply _ as lid ->
       let path_f, comp_f, path_arg = lookup_apply ~errors ~use ~loc lid env in
       let md = md (modtype_of_functor_appl comp_f path_f path_arg) in
       Papply(path_f, path_arg), md
@@ -2969,7 +2968,7 @@ and lookup_dot_module ~errors ~use ~loc l s env =
       use_module ~use ~loc path mda;
       (path, mda)
   | exception Not_found ->
-      may_lookup_error errors loc env (Unbound_module (Ldot(l, s)))
+      may_lookup_error errors loc env (Unbound_module (`Ldot(l, s)))
 
 let lookup_dot_value ~errors ~use ~loc l s env =
   let (path, comps) =
@@ -2981,7 +2980,7 @@ let lookup_dot_value ~errors ~use ~loc l s env =
       use_value ~use ~loc path vda;
       (path, vda.vda_description)
   | exception Not_found ->
-      may_lookup_error errors loc env (Unbound_value (Ldot(l, s), No_hint))
+      may_lookup_error errors loc env (Unbound_value (`Ldot(l, s), No_hint))
 
 let lookup_dot_type ~errors ~use ~loc l s env =
   let (p, comps) = lookup_structure_components ~errors ~use ~loc l env in
@@ -2991,7 +2990,7 @@ let lookup_dot_type ~errors ~use ~loc l s env =
       use_type ~use ~loc path tda;
       (path, tda)
   | exception Not_found ->
-      may_lookup_error errors loc env (Unbound_type (Ldot(l, s)))
+      may_lookup_error errors loc env (Unbound_type (`Ldot(l, s)))
 
 let lookup_dot_modtype ~errors ~use ~loc l s env =
   let (p, comps) = lookup_structure_components ~errors ~use ~loc l env in
@@ -3001,7 +3000,7 @@ let lookup_dot_modtype ~errors ~use ~loc l s env =
       use_modtype ~use ~loc path mta.mtda_declaration;
       (path, mta.mtda_declaration)
   | exception Not_found ->
-      may_lookup_error errors loc env (Unbound_modtype (Ldot(l, s)))
+      may_lookup_error errors loc env (Unbound_modtype (`Ldot(l, s)))
 
 let lookup_dot_class ~errors ~use ~loc l s env =
   let (p, comps) = lookup_structure_components ~errors ~use ~loc l env in
@@ -3011,7 +3010,7 @@ let lookup_dot_class ~errors ~use ~loc l s env =
       use_class ~use ~loc path clda;
       (path, clda.clda_declaration)
   | exception Not_found ->
-      may_lookup_error errors loc env (Unbound_class (Ldot(l, s)))
+      may_lookup_error errors loc env (Unbound_class (`Ldot(l, s)))
 
 let lookup_dot_cltype ~errors ~use ~loc l s env =
   let (p, comps) = lookup_structure_components ~errors ~use ~loc l env in
@@ -3021,13 +3020,13 @@ let lookup_dot_cltype ~errors ~use ~loc l s env =
       use_cltype ~use ~loc path cltda.cltda_declaration;
       (path, cltda.cltda_declaration)
   | exception Not_found ->
-      may_lookup_error errors loc env (Unbound_cltype (Ldot(l, s)))
+      may_lookup_error errors loc env (Unbound_cltype (`Ldot(l, s)))
 
 let lookup_all_dot_labels ~errors ~use ~loc usage l s env =
   let (_, comps) = lookup_structure_components ~errors ~use ~loc l env in
   match NameMap.find s.txt comps.comp_labels with
   | [] | exception Not_found ->
-      may_lookup_error errors loc env (Unbound_label (Ldot(l, s)))
+      may_lookup_error errors loc env (Unbound_label (`Ldot(l, s)))
   | lbls ->
       List.map
         (fun lbl ->
@@ -3037,7 +3036,7 @@ let lookup_all_dot_labels ~errors ~use ~loc usage l s env =
 
 let lookup_all_dot_constructors ~errors ~use ~loc usage l s env =
   match l with
-  | Longident.Lident { txt="*predef*"; _ } ->
+  | `Lident { txt="*predef*"; _ } ->
       (* Hack to support compilation of default arguments *)
       lookup_all_ident_constructors
         ~errors ~use ~loc usage s initial
@@ -3045,7 +3044,7 @@ let lookup_all_dot_constructors ~errors ~use ~loc usage l s env =
       let (_, comps) = lookup_structure_components ~errors ~use ~loc l env in
       match NameMap.find s.txt comps.comp_constrs with
       | [] | exception Not_found ->
-          may_lookup_error errors loc env (Unbound_constructor (Ldot(l, s)))
+          may_lookup_error errors loc env (Unbound_constructor (`Ldot(l, s)))
       | cstrs ->
           List.map
             (fun cda ->
@@ -3057,27 +3056,27 @@ let lookup_all_dot_constructors ~errors ~use ~loc usage l s env =
 
 let lookup_module_path ~errors ~use ~loc ~load lid env : Path.t =
   match lid with
-  | Lident s ->
+  | `Lident s ->
       if !Clflags.transparent_modules && not load then
         fst (lookup_ident_module Don't_load ~errors ~use ~loc s env)
       else
         fst (lookup_ident_module Load ~errors ~use ~loc s env)
-  | Ldot(l, s) -> fst (lookup_dot_module ~errors ~use ~loc l s env)
-  | Lapply _ as lid ->
+  | `Ldot(l, s) -> fst (lookup_dot_module ~errors ~use ~loc l s env)
+  | `Lapply _ as lid ->
       let path_f, _comp_f, path_arg = lookup_apply ~errors ~use ~loc lid env in
       Papply(path_f, path_arg)
 
 let lookup_value ~errors ~use ~loc lid env =
   match lid with
-  | Lident s -> lookup_ident_value ~errors ~use ~loc s env
-  | Ldot(l, s) -> lookup_dot_value ~errors ~use ~loc l s env
-  | Lapply _ -> assert false
+  | `Lident s -> lookup_ident_value ~errors ~use ~loc s env
+  | `Ldot(l, s) -> lookup_dot_value ~errors ~use ~loc l s env
+  | `Lapply _ -> assert false
 
 let lookup_type_full ~errors ~use ~loc lid env =
   match lid with
-  | Lident s -> lookup_ident_type ~errors ~use ~loc s env
-  | Ldot(l, s) -> lookup_dot_type ~errors ~use ~loc l s env
-  | Lapply _ -> assert false
+  | `Lident s -> lookup_ident_type ~errors ~use ~loc s env
+  | `Ldot(l, s) -> lookup_dot_type ~errors ~use ~loc l s env
+  | `Lapply _ -> assert false
 
 let lookup_type ~errors ~use ~loc lid env =
   let (path, tda) = lookup_type_full ~errors ~use ~loc lid env in
@@ -3085,9 +3084,9 @@ let lookup_type ~errors ~use ~loc lid env =
 
 let lookup_modtype_lazy ~errors ~use ~loc lid env =
   match lid with
-  | Lident s -> lookup_ident_modtype ~errors ~use ~loc s env
-  | Ldot(l, s) -> lookup_dot_modtype ~errors ~use ~loc l s env
-  | Lapply _ -> assert false
+  | `Lident s -> lookup_ident_modtype ~errors ~use ~loc s env
+  | `Ldot(l, s) -> lookup_dot_modtype ~errors ~use ~loc l s env
+  | `Lapply _ -> assert false
 
 let lookup_modtype ~errors ~use ~loc lid env =
   let (path, mt) = lookup_modtype_lazy ~errors ~use ~loc lid env in
@@ -3095,21 +3094,21 @@ let lookup_modtype ~errors ~use ~loc lid env =
 
 let lookup_class ~errors ~use ~loc lid env =
   match lid with
-  | Lident s -> lookup_ident_class ~errors ~use ~loc s env
-  | Ldot(l, s) -> lookup_dot_class ~errors ~use ~loc l s env
-  | Lapply _ -> assert false
+  | `Lident s -> lookup_ident_class ~errors ~use ~loc s env
+  | `Ldot(l, s) -> lookup_dot_class ~errors ~use ~loc l s env
+  | `Lapply _ -> assert false
 
 let lookup_cltype ~errors ~use ~loc lid env =
   match lid with
-  | Lident s -> lookup_ident_cltype ~errors ~use ~loc s env
-  | Ldot(l, s) -> lookup_dot_cltype ~errors ~use ~loc l s env
-  | Lapply _ -> assert false
+  | `Lident s -> lookup_ident_cltype ~errors ~use ~loc s env
+  | `Ldot(l, s) -> lookup_dot_cltype ~errors ~use ~loc l s env
+  | `Lapply _ -> assert false
 
 let lookup_all_labels ~errors ~use ~loc usage lid env =
   match lid with
-  | Lident s -> lookup_all_ident_labels ~errors ~use ~loc usage s env
-  | Ldot(l, s) -> lookup_all_dot_labels ~errors ~use ~loc usage l s env
-  | Lapply _ -> assert false
+  | `Lident s -> lookup_all_ident_labels ~errors ~use ~loc usage s env
+  | `Ldot(l, s) -> lookup_all_dot_labels ~errors ~use ~loc usage l s env
+  | `Lapply _ -> assert false
 
 let lookup_label ~errors ~use ~loc usage lid env =
   match lookup_all_labels ~errors ~use ~loc usage lid env with
@@ -3129,9 +3128,9 @@ let lookup_all_labels_from_type ~use ~loc usage ty_path env =
 
 let lookup_all_constructors ~errors ~use ~loc usage lid env =
   match lid with
-  | Lident s -> lookup_all_ident_constructors ~errors ~use ~loc usage s env
-  | Ldot(l, s) -> lookup_all_dot_constructors ~errors ~use ~loc usage l s env
-  | Lapply _ -> assert false
+  | `Lident s -> lookup_all_ident_constructors ~errors ~use ~loc usage s env
+  | `Ldot(l, s) -> lookup_all_dot_constructors ~errors ~use ~loc usage l s env
+  | `Lapply _ -> assert false
 
 let lookup_constructor ~errors ~use ~loc usage lid env =
   match lookup_all_constructors ~errors ~use ~loc usage lid env with
@@ -3267,7 +3266,7 @@ let lookup_instance_variable ?(use=true) ~loc name env =
           lookup_error loc env (Not_an_instance_variable name)
     end
   | (_, Val_unbound Val_unbound_instance_variable) ->
-      let lid = Lident (Location.mkloc name loc) in
+      let lid = `Lident (Location.mkloc name loc) in
       lookup_error loc env (Masked_instance_variable lid)
   | (_, Val_unbound Val_unbound_self) ->
       lookup_error loc env (Not_an_instance_variable name)
@@ -3527,10 +3526,10 @@ let pp_path ppf l = !print_path ppf l
 let spellcheck ppf extract env lid =
   let choices ~path name = Misc.spellcheck (extract path env) name.txt in
   match lid with
-    | Longident.Lapply _ -> ()
-    | Longident.Lident s ->
+    | `Lapply _ -> ()
+    | `Lident s ->
        Misc.did_you_mean ppf (fun () -> choices ~path:None s)
-    | Longident.Ldot (r, s) ->
+    | `Ldot (r, s) ->
        Misc.did_you_mean ppf (fun () -> choices ~path:(Some r) s)
 
 let spellcheck_name ppf extract env name =

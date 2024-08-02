@@ -18,7 +18,6 @@
 
 open Int64ops
 open Input_handling
-open Longident
 open Parser_aux
 open Debugcom
 
@@ -170,25 +169,25 @@ opt_signed_int64_eol :
 /* Identifiers and long identifiers */
 
 longident :
-    LIDENT                      { Lident (Location.mknoloc $1) }
-  | module_path DOT LIDENT      { Ldot($1, (Location.mknoloc $3)) }
-  | OPERATOR                    { Lident (Location.mknoloc $1) }
-  | module_path DOT OPERATOR    { Ldot($1, (Location.mknoloc $3)) }
-  | module_path DOT LPAREN OPERATOR RPAREN { Ldot($1, (Location.mknoloc $4)) }
+    LIDENT                      { `Lident (Location.mknoloc $1) }
+  | module_path DOT LIDENT      { `Ldot($1, (Location.mknoloc $3)) }
+  | OPERATOR                    { `Lident (Location.mknoloc $1) }
+  | module_path DOT OPERATOR    { `Ldot($1, (Location.mknoloc $3)) }
+  | module_path DOT LPAREN OPERATOR RPAREN { `Ldot($1, (Location.mknoloc $4)) }
 ;
 
 module_path :
-    UIDENT                      { Lident (Location.mknoloc $1) }
-  | module_path DOT UIDENT      { Ldot($1, (Location.mknoloc $3)) }
+    UIDENT                      { `Lident (Location.mknoloc $1) }
+  | module_path DOT UIDENT      { `Ldot($1, (Location.mknoloc $3)) }
 ;
 
 longident_eol :
     longident end_of_line       { $1 };
 
 opt_longident :
-    UIDENT                      { Some (Lident (Location.mknoloc $1)) }
-  | LIDENT                      { Some (Lident (Location.mknoloc $1)) }
-  | module_path DOT UIDENT      { Some (Ldot($1, (Location.mknoloc $3))) }
+    UIDENT                      { Some (`Lident (Location.mknoloc $1)) }
+  | LIDENT                      { Some (`Lident (Location.mknoloc $1)) }
+  | module_path DOT UIDENT      { Some (`Ldot($1, (Location.mknoloc $3))) }
   |                             { None };
 
 opt_longident_eol :

@@ -34,10 +34,10 @@ let fmt_location f loc =
 
 let rec fmt_longident_aux f x =
   match x with
-  | Longident.Lident { txt = s; _ } -> fprintf f "%s" s;
-  | Longident.Ldot (y, { txt = s; _ }) ->
+  | `Lident { txt = s; _ } -> fprintf f "%s" s;
+  | `Ldot (y, { txt = s; _ }) ->
       fprintf f "%a.%s" fmt_longident_aux y s;
-  | Longident.Lapply (y, z) ->
+  | `Lapply (y, z) ->
       fprintf f "%a(%a)" fmt_longident_aux y fmt_longident_aux z
 
 let fmt_longident f x = fprintf f "\"%a\"" fmt_longident_aux x.txt

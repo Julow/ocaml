@@ -33,9 +33,9 @@ let function_without_value_parameters loc =
 
 let simple_longident id =
   let rec is_simple = function
-    | Longident.Lident _ -> true
-    | Longident.Ldot (id, _) -> is_simple id
-    | Longident.Lapply _ -> false
+    | `Lident _ -> true
+    | `Ldot (id, _) -> is_simple id
+    | `Lapply _ -> false
   in
   if not (is_simple id.txt) then complex_id id.loc
 

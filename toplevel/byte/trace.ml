@@ -17,7 +17,6 @@
 
 open Format
 open Misc
-open Longident
 open Types
 open Topeval
 open Topcommon
@@ -72,9 +71,9 @@ let rec instrument_result env name ppf clos_typ =
   | Tarrow(l, t1, t2, _) ->
       let starred_name =
         match name with
-        | Lident id -> Lident({ id with txt = id.txt ^ "*" })
-        | Ldot(lid, id) -> Ldot(lid, { id with txt = id.txt ^ "*" })
-        | Lapply _ -> fatal_error "Trace.instrument_result" in
+        | `Lident id -> `Lident({ id with Location.txt = id.Location.txt ^ "*" })
+        | `Ldot(lid, id) -> `Ldot(lid, { id with Location.txt = id.Location.txt ^ "*" })
+        | `Lapply _ -> fatal_error "Trace.instrument_result" in
       let trace_res = instrument_result env starred_name ppf t2 in
       (fun clos_val ->
         Obj.repr (fun arg ->

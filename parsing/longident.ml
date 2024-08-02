@@ -15,36 +15,37 @@
 open Location
 
 type t =
-    Lident of string loc
-  | Ldot of t * string loc
-  | Lapply of t * t
+  [ `Lident of string loc
+  | `Ldot of t * string loc
+  | `Lapply of t * t
+  ]
 
 let rec same t t' =
   t == t'
   || match t, t' with
-  | Lident { txt = s; _ }, Lident { txt = s'; _ } ->
+  | `Lident { txt = s; _ }, `Lident { txt = s'; _ } ->
       String.equal s s'
-  | Ldot (t, { txt = s; _ }), Ldot (t', { txt = s'; _ }) ->
+  | `Ldot (t, { txt = s; _ }), `Ldot (t', { txt = s'; _ }) ->
       if String.equal s s' then
         same t t'
       else
         false
-  | Lapply (tl, tr), Lapply (tl', tr') ->
+  | `Lapply (tl, tr), `Lapply (tl', tr') ->
       same tl tl' && same tr tr'
   | _, _ -> false
 
 
 let rec flat accu = function
-    Lident { txt = s; _ } -> s :: accu
-  | Ldot(lid, { txt = s; _ }) -> flat (s :: accu) lid
-  | Lapply(_, _) -> Misc.fatal_error "Longident.flat"
+    `Lident { txt = s; _ } -> s :: accu
+  | `Ldot(lid, { txt = s; _ }) -> flat (s :: accu) lid
+  | `Lapply(_, _) -> Misc.fatal_error "Longident.flat"
 
 let flatten lid = flat [] lid
 
 let last = function
-    Lident s -> s
-  | Ldot(_, s) -> s
-  | Lapply(_, _) -> Misc.fatal_error "Longident.last"
+    `Lident s -> s
+  | `Ldot(_, s) -> s
+  | `Lapply(_, _) -> Misc.fatal_error "Longident.last"
 
 
 let rec split_at_dots s pos =
@@ -58,12 +59,12 @@ let unflatten l =
   match l with
   | [] -> None
   | hd :: tl ->
-    Some (List.fold_left (fun p s -> Ldot(p, mknoloc s))
-                         (Lident (mknoloc hd)) tl)
+    Some (List.fold_left (fun p s -> `Ldot(p, mknoloc s))
+                         (`Lident (mknoloc hd)) tl)
 
 let parse s =
   match unflatten (split_at_dots s 0) with
-  | None -> Lident (mknoloc "")
+  | None -> `Lident (mknoloc "")
             (* should not happen, but don't put assert false
                so as not to crash the toplevel (see Genprintval) *)
   | Some v -> v

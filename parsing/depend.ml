@@ -15,7 +15,6 @@
 
 open Asttypes
 open Location
-open Longident
 open Parsetree
 module String = Misc.Stdlib.String
 
@@ -48,9 +47,9 @@ let rec lookup_free p m =
 (* Returns the node corresponding to the structure at path p *)
 let rec lookup_map lid m =
   match lid with
-    Lident s    -> String.Map.find s.txt m
-  | Ldot (l, s) -> String.Map.find s.txt (get_map (lookup_map l m))
-  | Lapply _    -> raise Not_found
+    `Lident s    -> String.Map.find s.txt m
+  | `Ldot (l, s) -> String.Map.find s.txt (get_map (lookup_map l m))
+  | `Lapply _    -> raise Not_found
 
 let free_structure_names = ref String.Set.empty
 
@@ -58,15 +57,15 @@ let add_names s =
   free_structure_names := String.Set.union s !free_structure_names
 
 let rec add_path bv ?(p=[]) = function
-  | Lident { txt = s; _ } ->
+  | `Lident { txt = s; _ } ->
       let free =
         try lookup_free (s::p) bv with Not_found -> String.Set.singleton s
       in
       (*String.Set.iter (fun s -> Printf.eprintf "%s " s) free;
         prerr_endline "";*)
       add_names free
-  | Ldot(l, { txt = s; _ }) -> add_path bv ~p:(s::p) l
-  | Lapply(l1, l2) -> add_path bv l1; add_path bv l2
+  | `Ldot(l, { txt = s; _ }) -> add_path bv ~p:(s::p) l
+  | `Lapply(l1, l2) -> add_path bv l1; add_path bv l2
 
 let open_module bv lid =
   match lookup_map lid bv with
@@ -78,7 +77,7 @@ let open_module bv lid =
 
 let add_parent bv lid =
   match lid.txt with
-    Ldot(l, _s) -> add_path bv l
+    `Ldot(l, _s) -> add_path bv l
   | _ -> ()
 
 let add = add_parent
@@ -357,13 +356,13 @@ and add_modtype bv mty =
 
 and add_module_alias bv l =
   (* If we are in delayed dependencies mode, we delay the dependencies
-       induced by "Lident s" *)
+       induced by "`Lident s" *)
   (if !Clflags.transparent_modules then add_parent else add_module_path) bv l;
   try
     lookup_map l.txt bv
   with Not_found ->
     match l.txt with
-      Lident { txt = s; _ } -> make_leaf s
+      `Lident { txt = s; _ } -> make_leaf s
     | _ -> add_module_path bv l; bound (* cannot delay *)
 
 and add_modtype_binding bv mty =

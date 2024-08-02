@@ -14,7 +14,6 @@
 (**************************************************************************)
 
 open Misc
-open Longident
 open Path
 open Asttypes
 open Parsetree
@@ -2947,9 +2946,9 @@ let type_module_type_of env smod =
 let rec extend_path path =
   fun lid ->
     match lid with
-    | Lident  { txt = name; _ } -> Pdot(path, name)
-    | Ldot(m, { txt = name; _ }) -> Pdot(extend_path path m, name)
-    | Lapply _ -> assert false
+    | `Lident  { txt = name; _ } -> Pdot(path, name)
+    | `Ldot(m, { txt = name; _ }) -> Pdot(extend_path path m, name)
+    | `Lapply _ -> assert false
 
 (* Lookup a type's longident within a signature *)
 let lookup_type_in_sig sg =
@@ -2969,15 +2968,15 @@ let lookup_type_in_sig sg =
       (String.Map.empty, String.Map.empty) sg
   in
   let rec module_path = function
-    | Lident { txt = name; _ } -> Pident (String.Map.find name modules)
-    | Ldot(m, { txt = name; _ }) -> Pdot(module_path m, name)
-    | Lapply _ -> assert false
+    | `Lident { txt = name; _ } -> Pident (String.Map.find name modules)
+    | `Ldot(m, { txt = name; _ }) -> Pdot(module_path m, name)
+    | `Lapply _ -> assert false
   in
   fun lid ->
     match lid with
-    | Lident { txt = name; _ } -> Pident (String.Map.find name types)
-    | Ldot(m, { txt = name; _ }) -> Pdot(module_path m, name)
-    | Lapply _ -> assert false
+    | `Lident { txt = name; _ } -> Pident (String.Map.find name types)
+    | `Ldot(m, { txt = name; _ }) -> Pdot(module_path m, name)
+    | `Lapply _ -> assert false
 
 let type_package env m p fl =
   (* Same as Pexp_letmodule *)

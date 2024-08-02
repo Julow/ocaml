@@ -15,16 +15,24 @@ val mknoloc : 'a -> 'a Location.loc = <fun>
 
 let flatten_ident = L.flatten (L.Lident (mknoloc "foo"))
 [%%expect {|
-val flatten_ident : string list = ["foo"]
+Line 1, characters 30-56:
+1 | let flatten_ident = L.flatten (L.Lident (mknoloc "foo"))
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^
+Error: This expression should not be a constructor, the expected type is "L.t"
 |}]
 let flatten_dot = L.flatten (L.Ldot (L.Lident(mknoloc "M"), mknoloc "foo"))
 [%%expect {|
-val flatten_dot : string list = ["M"; "foo"]
+Line 1, characters 28-75:
+1 | let flatten_dot = L.flatten (L.Ldot (L.Lident(mknoloc "M"), mknoloc "foo"))
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Error: This expression should not be a constructor, the expected type is "L.t"
 |}]
 let flatten_apply = L.flatten (L.Lapply (L.Lident (mknoloc "F"), L.Lident (mknoloc "X")))
 [%%expect {|
->> Fatal error: Longident.flat
-Exception: Misc.Fatal_error.
+Line 1, characters 30-89:
+1 | let flatten_apply = L.flatten (L.Lapply (L.Lident (mknoloc "F"), L.Lident (mknoloc "X")))
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Error: This expression should not be a constructor, the expected type is "L.t"
 |}]
 
 let unflatten_empty = L.unflatten []
@@ -35,34 +43,43 @@ let unflatten_sing = L.unflatten ["foo"]
 [%%expect {|
 val unflatten_sing : L.t option =
   Some
-   (L.Lident
-     {Location.txt = "foo";
-      loc =
-       {Location.loc_start =
-         {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0;
-          pos_cnum = -1};
-        loc_end =
-         {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0;
-          pos_cnum = -1};
-        loc_ghost = true}})
+   (`Lident
+      {Location.txt = "foo";
+       loc =
+        {Location.loc_start =
+          {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0;
+           pos_cnum = -1};
+         loc_end =
+          {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0;
+           pos_cnum = -1};
+         loc_ghost = true}})
 |}]
 let unflatten_dot = L.unflatten ["M"; "N"; "foo"]
 [%%expect {|
 val unflatten_dot : L.t option =
   Some
-   (L.Ldot
-     (L.Ldot
-       (L.Lident
-         {Location.txt = "M";
-          loc =
-           {Location.loc_start =
-             {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0;
-              pos_cnum = -1};
-            loc_end =
-             {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0;
-              pos_cnum = -1};
-            loc_ghost = true}},
-       {Location.txt = "N";
+   (`Ldot
+      (`Ldot
+         (`Lident
+            {Location.txt = "M";
+             loc =
+              {Location.loc_start =
+                {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0;
+                 pos_cnum = -1};
+               loc_end =
+                {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0;
+                 pos_cnum = -1};
+               loc_ghost = true}},
+          {Location.txt = "N";
+           loc =
+            {Location.loc_start =
+              {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0;
+               pos_cnum = -1};
+             loc_end =
+              {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0;
+               pos_cnum = -1};
+             loc_ghost = true}}),
+       {Location.txt = "foo";
         loc =
          {Location.loc_start =
            {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0;
@@ -70,56 +87,37 @@ val unflatten_dot : L.t option =
           loc_end =
            {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0;
             pos_cnum = -1};
-          loc_ghost = true}}),
-     {Location.txt = "foo";
-      loc =
-       {Location.loc_start =
-         {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0;
-          pos_cnum = -1};
-        loc_end =
-         {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0;
-          pos_cnum = -1};
-        loc_ghost = true}}))
+          loc_ghost = true}}))
 |}]
 
 let last_ident = L.last (L.Lident (mknoloc "foo"))
 [%%expect {|
-val last_ident : string Location.loc =
-  {Location.txt = "foo";
-   loc =
-    {Location.loc_start =
-      {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0; pos_cnum = -1};
-     loc_end =
-      {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0; pos_cnum = -1};
-     loc_ghost = true}}
+Line 1, characters 24-50:
+1 | let last_ident = L.last (L.Lident (mknoloc "foo"))
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^
+Error: This expression should not be a constructor, the expected type is "L.t"
 |}]
 let last_dot = L.last (L.Ldot (L.Lident (mknoloc "M"), mknoloc "foo"))
 [%%expect {|
-val last_dot : string Location.loc =
-  {Location.txt = "foo";
-   loc =
-    {Location.loc_start =
-      {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0; pos_cnum = -1};
-     loc_end =
-      {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0; pos_cnum = -1};
-     loc_ghost = true}}
+Line 1, characters 22-70:
+1 | let last_dot = L.last (L.Ldot (L.Lident (mknoloc "M"), mknoloc "foo"))
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Error: This expression should not be a constructor, the expected type is "L.t"
 |}]
 let last_apply = L.last (L.Lapply (L.Lident (mknoloc "F"), L.Lident (mknoloc "X")))
 [%%expect {|
->> Fatal error: Longident.last
-Exception: Misc.Fatal_error.
+Line 1, characters 24-83:
+1 | let last_apply = L.last (L.Lapply (L.Lident (mknoloc "F"), L.Lident (mknoloc "X")))
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Error: This expression should not be a constructor, the expected type is "L.t"
 |}]
 let last_dot_apply = L.last
     (L.Ldot (L.Lapply (L.Lident (mknoloc "F"), L.Lident (mknoloc "X")), mknoloc "foo"))
 [%%expect {|
-val last_dot_apply : string Location.loc =
-  {Location.txt = "foo";
-   loc =
-    {Location.loc_start =
-      {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0; pos_cnum = -1};
-     loc_end =
-      {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0; pos_cnum = -1};
-     loc_ghost = true}}
+Line 2, characters 4-87:
+2 |     (L.Ldot (L.Lapply (L.Lident (mknoloc "F"), L.Lident (mknoloc "X")), mknoloc "foo"))
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Error: This expression should not be a constructor, the expected type is "L.t"
 |}];;
 
 type parse_result = { flat: L.t; spec:L.t; any_is_correct:bool }
@@ -136,16 +134,16 @@ let parse_empty_val = Parse.longident (Lexing.from_string "")
 type parse_result = { flat : L.t; spec : L.t; any_is_correct : bool; }
 val test : (Lexing.lexbuf -> L.t) -> string -> parse_result = <fun>
 val parse_empty : L.t =
-  L.Lident
-   {Location.txt = "";
-    loc =
-     {Location.loc_start =
-       {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0;
-        pos_cnum = -1};
-      loc_end =
-       {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0;
-        pos_cnum = -1};
-      loc_ghost = true}}
+  `Lident
+    {Location.txt = "";
+     loc =
+      {Location.loc_start =
+        {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0;
+         pos_cnum = -1};
+       loc_end =
+        {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0;
+         pos_cnum = -1};
+       loc_ghost = true}}
 Exception:
 Syntaxerr.Error
  (Syntaxerr.Other
@@ -159,77 +157,33 @@ let parse_ident = test Parse.val_ident "foo"
 [%%expect {|
 val parse_ident : parse_result =
   {flat =
-    L.Lident
-     {Location.txt = "foo";
-      loc =
-       {Location.loc_start =
-         {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0;
-          pos_cnum = -1};
-        loc_end =
-         {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0;
-          pos_cnum = -1};
-        loc_ghost = true}};
+    `Lident
+      {Location.txt = "foo";
+       loc =
+        {Location.loc_start =
+          {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0;
+           pos_cnum = -1};
+         loc_end =
+          {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0;
+           pos_cnum = -1};
+         loc_ghost = true}};
    spec =
-    L.Lident
-     {Location.txt = "foo";
-      loc =
-       {Location.loc_start =
-         {Lexing.pos_fname = ""; pos_lnum = 1; pos_bol = 0; pos_cnum = 0};
-        loc_end =
-         {Lexing.pos_fname = ""; pos_lnum = 1; pos_bol = 0; pos_cnum = 3};
-        loc_ghost = false}};
+    `Lident
+      {Location.txt = "foo";
+       loc =
+        {Location.loc_start =
+          {Lexing.pos_fname = ""; pos_lnum = 1; pos_bol = 0; pos_cnum = 0};
+         loc_end =
+          {Lexing.pos_fname = ""; pos_lnum = 1; pos_bol = 0; pos_cnum = 3};
+         loc_ghost = false}};
    any_is_correct = true}
 |}]
 let parse_dot = test Parse.val_ident "M.foo"
 [%%expect {|
 val parse_dot : parse_result =
   {flat =
-    L.Ldot
-     (L.Lident
-       {Location.txt = "M";
-        loc =
-         {Location.loc_start =
-           {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0;
-            pos_cnum = -1};
-          loc_end =
-           {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0;
-            pos_cnum = -1};
-          loc_ghost = true}},
-     {Location.txt = "foo";
-      loc =
-       {Location.loc_start =
-         {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0;
-          pos_cnum = -1};
-        loc_end =
-         {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0;
-          pos_cnum = -1};
-        loc_ghost = true}});
-   spec =
-    L.Ldot
-     (L.Lident
-       {Location.txt = "M";
-        loc =
-         {Location.loc_start =
-           {Lexing.pos_fname = ""; pos_lnum = 1; pos_bol = 0; pos_cnum = 0};
-          loc_end =
-           {Lexing.pos_fname = ""; pos_lnum = 1; pos_bol = 0; pos_cnum = 1};
-          loc_ghost = false}},
-     {Location.txt = "foo";
-      loc =
-       {Location.loc_start =
-         {Lexing.pos_fname = ""; pos_lnum = 1; pos_bol = 0; pos_cnum = 2};
-        loc_end =
-         {Lexing.pos_fname = ""; pos_lnum = 1; pos_bol = 0; pos_cnum = 5};
-        loc_ghost = false}});
-   any_is_correct = true}
-|}]
-let parse_path = test Parse.val_ident "M.N.foo"
-[%%expect {|
-val parse_path : parse_result =
-  {flat =
-    L.Ldot
-     (L.Ldot
-       (L.Lident
+    `Ldot
+      (`Lident
          {Location.txt = "M";
           loc =
            {Location.loc_start =
@@ -239,7 +193,7 @@ val parse_path : parse_result =
              {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0;
               pos_cnum = -1};
             loc_ghost = true}},
-       {Location.txt = "N";
+       {Location.txt = "foo";
         loc =
          {Location.loc_start =
            {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0;
@@ -247,20 +201,10 @@ val parse_path : parse_result =
           loc_end =
            {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0;
             pos_cnum = -1};
-          loc_ghost = true}}),
-     {Location.txt = "foo";
-      loc =
-       {Location.loc_start =
-         {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0;
-          pos_cnum = -1};
-        loc_end =
-         {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0;
-          pos_cnum = -1};
-        loc_ghost = true}});
+          loc_ghost = true}});
    spec =
-    L.Ldot
-     (L.Ldot
-       (L.Lident
+    `Ldot
+      (`Lident
          {Location.txt = "M";
           loc =
            {Location.loc_start =
@@ -268,20 +212,78 @@ val parse_path : parse_result =
             loc_end =
              {Lexing.pos_fname = ""; pos_lnum = 1; pos_bol = 0; pos_cnum = 1};
             loc_ghost = false}},
-       {Location.txt = "N";
+       {Location.txt = "foo";
         loc =
          {Location.loc_start =
            {Lexing.pos_fname = ""; pos_lnum = 1; pos_bol = 0; pos_cnum = 2};
           loc_end =
-           {Lexing.pos_fname = ""; pos_lnum = 1; pos_bol = 0; pos_cnum = 3};
-          loc_ghost = false}}),
-     {Location.txt = "foo";
-      loc =
-       {Location.loc_start =
-         {Lexing.pos_fname = ""; pos_lnum = 1; pos_bol = 0; pos_cnum = 4};
-        loc_end =
-         {Lexing.pos_fname = ""; pos_lnum = 1; pos_bol = 0; pos_cnum = 7};
-        loc_ghost = false}});
+           {Lexing.pos_fname = ""; pos_lnum = 1; pos_bol = 0; pos_cnum = 5};
+          loc_ghost = false}});
+   any_is_correct = true}
+|}]
+let parse_path = test Parse.val_ident "M.N.foo"
+[%%expect {|
+val parse_path : parse_result =
+  {flat =
+    `Ldot
+      (`Ldot
+         (`Lident
+            {Location.txt = "M";
+             loc =
+              {Location.loc_start =
+                {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0;
+                 pos_cnum = -1};
+               loc_end =
+                {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0;
+                 pos_cnum = -1};
+               loc_ghost = true}},
+          {Location.txt = "N";
+           loc =
+            {Location.loc_start =
+              {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0;
+               pos_cnum = -1};
+             loc_end =
+              {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0;
+               pos_cnum = -1};
+             loc_ghost = true}}),
+       {Location.txt = "foo";
+        loc =
+         {Location.loc_start =
+           {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0;
+            pos_cnum = -1};
+          loc_end =
+           {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0;
+            pos_cnum = -1};
+          loc_ghost = true}});
+   spec =
+    `Ldot
+      (`Ldot
+         (`Lident
+            {Location.txt = "M";
+             loc =
+              {Location.loc_start =
+                {Lexing.pos_fname = ""; pos_lnum = 1; pos_bol = 0;
+                 pos_cnum = 0};
+               loc_end =
+                {Lexing.pos_fname = ""; pos_lnum = 1; pos_bol = 0;
+                 pos_cnum = 1};
+               loc_ghost = false}},
+          {Location.txt = "N";
+           loc =
+            {Location.loc_start =
+              {Lexing.pos_fname = ""; pos_lnum = 1; pos_bol = 0;
+               pos_cnum = 2};
+             loc_end =
+              {Lexing.pos_fname = ""; pos_lnum = 1; pos_bol = 0;
+               pos_cnum = 3};
+             loc_ghost = false}}),
+       {Location.txt = "foo";
+        loc =
+         {Location.loc_start =
+           {Lexing.pos_fname = ""; pos_lnum = 1; pos_bol = 0; pos_cnum = 4};
+          loc_end =
+           {Lexing.pos_fname = ""; pos_lnum = 1; pos_bol = 0; pos_cnum = 7};
+          loc_ghost = false}});
    any_is_correct = true}
 |}]
 let parse_complex = test  Parse.type_ident "M.F(M.N).N.foo"
@@ -290,12 +292,30 @@ let parse_complex = test  Parse.type_ident "M.F(M.N).N.foo"
 [%%expect {|
 val parse_complex : parse_result =
   {flat =
-    L.Ldot
-     (L.Ldot
-       (L.Ldot
-         (L.Ldot
-           (L.Lident
-             {Location.txt = "M";
+    `Ldot
+      (`Ldot
+         (`Ldot
+            (`Ldot
+               (`Lident
+                  {Location.txt = "M";
+                   loc =
+                    {Location.loc_start =
+                      {Lexing.pos_fname = "_none_"; pos_lnum = 0;
+                       pos_bol = 0; pos_cnum = -1};
+                     loc_end =
+                      {Lexing.pos_fname = "_none_"; pos_lnum = 0;
+                       pos_bol = 0; pos_cnum = -1};
+                     loc_ghost = true}},
+                {Location.txt = "F(M";
+                 loc =
+                  {Location.loc_start =
+                    {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0;
+                     pos_cnum = -1};
+                   loc_end =
+                    {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0;
+                     pos_cnum = -1};
+                   loc_ghost = true}}),
+             {Location.txt = "N)";
               loc =
                {Location.loc_start =
                  {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0;
@@ -303,26 +323,17 @@ val parse_complex : parse_result =
                 loc_end =
                  {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0;
                   pos_cnum = -1};
-                loc_ghost = true}},
-           {Location.txt = "F(M";
-            loc =
-             {Location.loc_start =
-               {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0;
-                pos_cnum = -1};
-              loc_end =
-               {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0;
-                pos_cnum = -1};
-              loc_ghost = true}}),
-         {Location.txt = "N)";
-          loc =
-           {Location.loc_start =
-             {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0;
-              pos_cnum = -1};
-            loc_end =
-             {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0;
-              pos_cnum = -1};
-            loc_ghost = true}}),
-       {Location.txt = "N";
+                loc_ghost = true}}),
+          {Location.txt = "N";
+           loc =
+            {Location.loc_start =
+              {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0;
+               pos_cnum = -1};
+             loc_end =
+              {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0;
+               pos_cnum = -1};
+             loc_ghost = true}}),
+       {Location.txt = "foo";
         loc =
          {Location.loc_start =
            {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0;
@@ -330,74 +341,67 @@ val parse_complex : parse_result =
           loc_end =
            {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0;
             pos_cnum = -1};
-          loc_ghost = true}}),
-     {Location.txt = "foo";
-      loc =
-       {Location.loc_start =
-         {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0;
-          pos_cnum = -1};
-        loc_end =
-         {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0;
-          pos_cnum = -1};
-        loc_ghost = true}});
+          loc_ghost = true}});
    spec =
-    L.Ldot
-     (L.Ldot
-       (L.Lapply
-         (L.Ldot
-           (L.Lident
-             {Location.txt = "M";
-              loc =
-               {Location.loc_start =
-                 {Lexing.pos_fname = ""; pos_lnum = 1; pos_bol = 0;
-                  pos_cnum = 0};
-                loc_end =
-                 {Lexing.pos_fname = ""; pos_lnum = 1; pos_bol = 0;
-                  pos_cnum = 1};
-                loc_ghost = false}},
-           {Location.txt = "F";
-            loc =
-             {Location.loc_start =
-               {Lexing.pos_fname = ""; pos_lnum = 1; pos_bol = 0;
-                pos_cnum = 2};
-              loc_end =
-               {Lexing.pos_fname = ""; pos_lnum = 1; pos_bol = 0;
-                pos_cnum = 3};
-              loc_ghost = false}}),
-         L.Ldot
-          (L.Lident
-            {Location.txt = "M";
-             loc =
-              {Location.loc_start =
-                {Lexing.pos_fname = ""; pos_lnum = 1; pos_bol = 0;
-                 pos_cnum = 4};
-               loc_end =
-                {Lexing.pos_fname = ""; pos_lnum = 1; pos_bol = 0;
-                 pos_cnum = 5};
-               loc_ghost = false}},
+    `Ldot
+      (`Ldot
+         (`Lapply
+            (`Ldot
+               (`Lident
+                  {Location.txt = "M";
+                   loc =
+                    {Location.loc_start =
+                      {Lexing.pos_fname = ""; pos_lnum = 1; pos_bol = 0;
+                       pos_cnum = 0};
+                     loc_end =
+                      {Lexing.pos_fname = ""; pos_lnum = 1; pos_bol = 0;
+                       pos_cnum = 1};
+                     loc_ghost = false}},
+                {Location.txt = "F";
+                 loc =
+                  {Location.loc_start =
+                    {Lexing.pos_fname = ""; pos_lnum = 1; pos_bol = 0;
+                     pos_cnum = 2};
+                   loc_end =
+                    {Lexing.pos_fname = ""; pos_lnum = 1; pos_bol = 0;
+                     pos_cnum = 3};
+                   loc_ghost = false}}),
+             `Ldot
+               (`Lident
+                  {Location.txt = "M";
+                   loc =
+                    {Location.loc_start =
+                      {Lexing.pos_fname = ""; pos_lnum = 1; pos_bol = 0;
+                       pos_cnum = 4};
+                     loc_end =
+                      {Lexing.pos_fname = ""; pos_lnum = 1; pos_bol = 0;
+                       pos_cnum = 5};
+                     loc_ghost = false}},
+                {Location.txt = "N";
+                 loc =
+                  {Location.loc_start =
+                    {Lexing.pos_fname = ""; pos_lnum = 1; pos_bol = 0;
+                     pos_cnum = 6};
+                   loc_end =
+                    {Lexing.pos_fname = ""; pos_lnum = 1; pos_bol = 0;
+                     pos_cnum = 7};
+                   loc_ghost = false}})),
           {Location.txt = "N";
            loc =
             {Location.loc_start =
               {Lexing.pos_fname = ""; pos_lnum = 1; pos_bol = 0;
-               pos_cnum = 6};
+               pos_cnum = 9};
              loc_end =
               {Lexing.pos_fname = ""; pos_lnum = 1; pos_bol = 0;
-               pos_cnum = 7};
-             loc_ghost = false}})),
-       {Location.txt = "N";
+               pos_cnum = 10};
+             loc_ghost = false}}),
+       {Location.txt = "foo";
         loc =
          {Location.loc_start =
-           {Lexing.pos_fname = ""; pos_lnum = 1; pos_bol = 0; pos_cnum = 9};
+           {Lexing.pos_fname = ""; pos_lnum = 1; pos_bol = 0; pos_cnum = 11};
           loc_end =
-           {Lexing.pos_fname = ""; pos_lnum = 1; pos_bol = 0; pos_cnum = 10};
-          loc_ghost = false}}),
-     {Location.txt = "foo";
-      loc =
-       {Location.loc_start =
-         {Lexing.pos_fname = ""; pos_lnum = 1; pos_bol = 0; pos_cnum = 11};
-        loc_end =
-         {Lexing.pos_fname = ""; pos_lnum = 1; pos_bol = 0; pos_cnum = 14};
-        loc_ghost = false}});
+           {Lexing.pos_fname = ""; pos_lnum = 1; pos_bol = 0; pos_cnum = 14};
+          loc_ghost = false}});
    any_is_correct = true}
 |}]
 
@@ -406,63 +410,63 @@ let parse_op = test Parse.val_ident "M.(.%.()<-)"
 [%%expect {|
 val parse_op : parse_result =
   {flat =
-    L.Ldot
-     (L.Ldot
-       (L.Ldot
-         (L.Lident
-           {Location.txt = "M";
-            loc =
-             {Location.loc_start =
-               {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0;
-                pos_cnum = -1};
-              loc_end =
-               {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0;
-                pos_cnum = -1};
-              loc_ghost = true}},
-         {Location.txt = "(";
+    `Ldot
+      (`Ldot
+         (`Ldot
+            (`Lident
+               {Location.txt = "M";
+                loc =
+                 {Location.loc_start =
+                   {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0;
+                    pos_cnum = -1};
+                  loc_end =
+                   {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0;
+                    pos_cnum = -1};
+                  loc_ghost = true}},
+             {Location.txt = "(";
+              loc =
+               {Location.loc_start =
+                 {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0;
+                  pos_cnum = -1};
+                loc_end =
+                 {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0;
+                  pos_cnum = -1};
+                loc_ghost = true}}),
+          {Location.txt = "%";
+           loc =
+            {Location.loc_start =
+              {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0;
+               pos_cnum = -1};
+             loc_end =
+              {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0;
+               pos_cnum = -1};
+             loc_ghost = true}}),
+       {Location.txt = "()<-)";
+        loc =
+         {Location.loc_start =
+           {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0;
+            pos_cnum = -1};
+          loc_end =
+           {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0;
+            pos_cnum = -1};
+          loc_ghost = true}});
+   spec =
+    `Ldot
+      (`Lident
+         {Location.txt = "M";
           loc =
            {Location.loc_start =
-             {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0;
-              pos_cnum = -1};
+             {Lexing.pos_fname = ""; pos_lnum = 1; pos_bol = 0; pos_cnum = 0};
             loc_end =
-             {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0;
-              pos_cnum = -1};
-            loc_ghost = true}}),
-       {Location.txt = "%";
+             {Lexing.pos_fname = ""; pos_lnum = 1; pos_bol = 0; pos_cnum = 1};
+            loc_ghost = false}},
+       {Location.txt = ".%.()<-";
         loc =
          {Location.loc_start =
-           {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0;
-            pos_cnum = -1};
+           {Lexing.pos_fname = ""; pos_lnum = 1; pos_bol = 0; pos_cnum = 2};
           loc_end =
-           {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0;
-            pos_cnum = -1};
-          loc_ghost = true}}),
-     {Location.txt = "()<-)";
-      loc =
-       {Location.loc_start =
-         {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0;
-          pos_cnum = -1};
-        loc_end =
-         {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0;
-          pos_cnum = -1};
-        loc_ghost = true}});
-   spec =
-    L.Ldot
-     (L.Lident
-       {Location.txt = "M";
-        loc =
-         {Location.loc_start =
-           {Lexing.pos_fname = ""; pos_lnum = 1; pos_bol = 0; pos_cnum = 0};
-          loc_end =
-           {Lexing.pos_fname = ""; pos_lnum = 1; pos_bol = 0; pos_cnum = 1};
-          loc_ghost = false}},
-     {Location.txt = ".%.()<-";
-      loc =
-       {Location.loc_start =
-         {Lexing.pos_fname = ""; pos_lnum = 1; pos_bol = 0; pos_cnum = 2};
-        loc_end =
-         {Lexing.pos_fname = ""; pos_lnum = 1; pos_bol = 0; pos_cnum = 11};
-        loc_ghost = false}});
+           {Lexing.pos_fname = ""; pos_lnum = 1; pos_bol = 0; pos_cnum = 11};
+          loc_ghost = false}});
    any_is_correct = true}
 |}]
 
@@ -471,9 +475,18 @@ let parse_let_op = test Parse.val_ident "M.(let+*!)"
 [%%expect {|
 val parse_let_op : parse_result =
   {flat =
-    L.Ldot
-     (L.Lident
-       {Location.txt = "M";
+    `Ldot
+      (`Lident
+         {Location.txt = "M";
+          loc =
+           {Location.loc_start =
+             {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0;
+              pos_cnum = -1};
+            loc_end =
+             {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0;
+              pos_cnum = -1};
+            loc_ghost = true}},
+       {Location.txt = "(let+*!)";
         loc =
          {Location.loc_start =
            {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0;
@@ -481,33 +494,24 @@ val parse_let_op : parse_result =
           loc_end =
            {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0;
             pos_cnum = -1};
-          loc_ghost = true}},
-     {Location.txt = "(let+*!)";
-      loc =
-       {Location.loc_start =
-         {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0;
-          pos_cnum = -1};
-        loc_end =
-         {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0;
-          pos_cnum = -1};
-        loc_ghost = true}});
+          loc_ghost = true}});
    spec =
-    L.Ldot
-     (L.Lident
-       {Location.txt = "M";
+    `Ldot
+      (`Lident
+         {Location.txt = "M";
+          loc =
+           {Location.loc_start =
+             {Lexing.pos_fname = ""; pos_lnum = 1; pos_bol = 0; pos_cnum = 0};
+            loc_end =
+             {Lexing.pos_fname = ""; pos_lnum = 1; pos_bol = 0; pos_cnum = 1};
+            loc_ghost = false}},
+       {Location.txt = "let+*!";
         loc =
          {Location.loc_start =
-           {Lexing.pos_fname = ""; pos_lnum = 1; pos_bol = 0; pos_cnum = 0};
+           {Lexing.pos_fname = ""; pos_lnum = 1; pos_bol = 0; pos_cnum = 2};
           loc_end =
-           {Lexing.pos_fname = ""; pos_lnum = 1; pos_bol = 0; pos_cnum = 1};
-          loc_ghost = false}},
-     {Location.txt = "let+*!";
-      loc =
-       {Location.loc_start =
-         {Lexing.pos_fname = ""; pos_lnum = 1; pos_bol = 0; pos_cnum = 2};
-        loc_end =
-         {Lexing.pos_fname = ""; pos_lnum = 1; pos_bol = 0; pos_cnum = 10};
-        loc_ghost = false}});
+           {Lexing.pos_fname = ""; pos_lnum = 1; pos_bol = 0; pos_cnum = 10};
+          loc_ghost = false}});
    any_is_correct = true}
 |}]
 
@@ -515,25 +519,25 @@ let constr = test Parse.constr_ident "true"
 [%%expect{|
 val constr : parse_result =
   {flat =
-    L.Lident
-     {Location.txt = "true";
-      loc =
-       {Location.loc_start =
-         {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0;
-          pos_cnum = -1};
-        loc_end =
-         {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0;
-          pos_cnum = -1};
-        loc_ghost = true}};
+    `Lident
+      {Location.txt = "true";
+       loc =
+        {Location.loc_start =
+          {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0;
+           pos_cnum = -1};
+         loc_end =
+          {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0;
+           pos_cnum = -1};
+         loc_ghost = true}};
    spec =
-    L.Lident
-     {Location.txt = "true";
-      loc =
-       {Location.loc_start =
-         {Lexing.pos_fname = ""; pos_lnum = 1; pos_bol = 0; pos_cnum = 0};
-        loc_end =
-         {Lexing.pos_fname = ""; pos_lnum = 1; pos_bol = 0; pos_cnum = 4};
-        loc_ghost = false}};
+    `Lident
+      {Location.txt = "true";
+       loc =
+        {Location.loc_start =
+          {Lexing.pos_fname = ""; pos_lnum = 1; pos_bol = 0; pos_cnum = 0};
+         loc_end =
+          {Lexing.pos_fname = ""; pos_lnum = 1; pos_bol = 0; pos_cnum = 4};
+         loc_ghost = false}};
    any_is_correct = true}
 |}]
 
@@ -541,96 +545,20 @@ let prefix_constr = test Parse.constr_ident "A.B.C.(::)"
 [%%expect{|
 val prefix_constr : parse_result =
   {flat =
-    L.Ldot
-     (L.Ldot
-       (L.Ldot
-         (L.Lident
-           {Location.txt = "A";
-            loc =
-             {Location.loc_start =
-               {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0;
-                pos_cnum = -1};
-              loc_end =
-               {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0;
-                pos_cnum = -1};
-              loc_ghost = true}},
-         {Location.txt = "B";
-          loc =
-           {Location.loc_start =
-             {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0;
-              pos_cnum = -1};
-            loc_end =
-             {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0;
-              pos_cnum = -1};
-            loc_ghost = true}}),
-       {Location.txt = "C";
-        loc =
-         {Location.loc_start =
-           {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0;
-            pos_cnum = -1};
-          loc_end =
-           {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0;
-            pos_cnum = -1};
-          loc_ghost = true}}),
-     {Location.txt = "(::)";
-      loc =
-       {Location.loc_start =
-         {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0;
-          pos_cnum = -1};
-        loc_end =
-         {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0;
-          pos_cnum = -1};
-        loc_ghost = true}});
-   spec =
-    L.Ldot
-     (L.Ldot
-       (L.Ldot
-         (L.Lident
-           {Location.txt = "A";
-            loc =
-             {Location.loc_start =
-               {Lexing.pos_fname = ""; pos_lnum = 1; pos_bol = 0;
-                pos_cnum = 0};
-              loc_end =
-               {Lexing.pos_fname = ""; pos_lnum = 1; pos_bol = 0;
-                pos_cnum = 1};
-              loc_ghost = false}},
-         {Location.txt = "B";
-          loc =
-           {Location.loc_start =
-             {Lexing.pos_fname = ""; pos_lnum = 1; pos_bol = 0; pos_cnum = 2};
-            loc_end =
-             {Lexing.pos_fname = ""; pos_lnum = 1; pos_bol = 0; pos_cnum = 3};
-            loc_ghost = false}}),
-       {Location.txt = "C";
-        loc =
-         {Location.loc_start =
-           {Lexing.pos_fname = ""; pos_lnum = 1; pos_bol = 0; pos_cnum = 4};
-          loc_end =
-           {Lexing.pos_fname = ""; pos_lnum = 1; pos_bol = 0; pos_cnum = 5};
-          loc_ghost = false}}),
-     {Location.txt = "::";
-      loc =
-       {Location.loc_start =
-         {Lexing.pos_fname = ""; pos_lnum = 1; pos_bol = 0; pos_cnum = 6};
-        loc_end =
-         {Lexing.pos_fname = ""; pos_lnum = 1; pos_bol = 0; pos_cnum = 10};
-        loc_ghost = false}});
-   any_is_correct = true}
-|}]
-
-
-
-let mod_ext = test Parse.extended_module_path "A.F(B.C(X)).G(Y).D"
-[%%expect{|
-val mod_ext : parse_result =
-  {flat =
-    L.Ldot
-     (L.Ldot
-       (L.Ldot
-         (L.Ldot
-           (L.Lident
-             {Location.txt = "A";
+    `Ldot
+      (`Ldot
+         (`Ldot
+            (`Lident
+               {Location.txt = "A";
+                loc =
+                 {Location.loc_start =
+                   {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0;
+                    pos_cnum = -1};
+                  loc_end =
+                   {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0;
+                    pos_cnum = -1};
+                  loc_ghost = true}},
+             {Location.txt = "B";
               loc =
                {Location.loc_start =
                  {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0;
@@ -638,26 +566,17 @@ val mod_ext : parse_result =
                 loc_end =
                  {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0;
                   pos_cnum = -1};
-                loc_ghost = true}},
-           {Location.txt = "F(B";
-            loc =
-             {Location.loc_start =
-               {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0;
-                pos_cnum = -1};
-              loc_end =
-               {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0;
-                pos_cnum = -1};
-              loc_ghost = true}}),
-         {Location.txt = "C(X))";
-          loc =
-           {Location.loc_start =
-             {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0;
-              pos_cnum = -1};
-            loc_end =
-             {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0;
-              pos_cnum = -1};
-            loc_ghost = true}}),
-       {Location.txt = "G(Y)";
+                loc_ghost = true}}),
+          {Location.txt = "C";
+           loc =
+            {Location.loc_start =
+              {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0;
+               pos_cnum = -1};
+             loc_end =
+              {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0;
+               pos_cnum = -1};
+             loc_ghost = true}}),
+       {Location.txt = "(::)";
         loc =
          {Location.loc_start =
            {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0;
@@ -665,23 +584,12 @@ val mod_ext : parse_result =
           loc_end =
            {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0;
             pos_cnum = -1};
-          loc_ghost = true}}),
-     {Location.txt = "D";
-      loc =
-       {Location.loc_start =
-         {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0;
-          pos_cnum = -1};
-        loc_end =
-         {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0;
-          pos_cnum = -1};
-        loc_ghost = true}});
+          loc_ghost = true}});
    spec =
-    L.Ldot
-     (L.Lapply
-       (L.Ldot
-         (L.Lapply
-           (L.Ldot
-             (L.Lident
+    `Ldot
+      (`Ldot
+         (`Ldot
+            (`Lident
                {Location.txt = "A";
                 loc =
                  {Location.loc_start =
@@ -691,7 +599,7 @@ val mod_ext : parse_result =
                    {Lexing.pos_fname = ""; pos_lnum = 1; pos_bol = 0;
                     pos_cnum = 1};
                   loc_ghost = false}},
-             {Location.txt = "F";
+             {Location.txt = "B";
               loc =
                {Location.loc_start =
                  {Lexing.pos_fname = ""; pos_lnum = 1; pos_bol = 0;
@@ -700,61 +608,163 @@ val mod_ext : parse_result =
                  {Lexing.pos_fname = ""; pos_lnum = 1; pos_bol = 0;
                   pos_cnum = 3};
                 loc_ghost = false}}),
-           L.Lapply
-            (L.Ldot
-              (L.Lident
-                {Location.txt = "B";
+          {Location.txt = "C";
+           loc =
+            {Location.loc_start =
+              {Lexing.pos_fname = ""; pos_lnum = 1; pos_bol = 0;
+               pos_cnum = 4};
+             loc_end =
+              {Lexing.pos_fname = ""; pos_lnum = 1; pos_bol = 0;
+               pos_cnum = 5};
+             loc_ghost = false}}),
+       {Location.txt = "::";
+        loc =
+         {Location.loc_start =
+           {Lexing.pos_fname = ""; pos_lnum = 1; pos_bol = 0; pos_cnum = 6};
+          loc_end =
+           {Lexing.pos_fname = ""; pos_lnum = 1; pos_bol = 0; pos_cnum = 10};
+          loc_ghost = false}});
+   any_is_correct = true}
+|}]
+
+
+
+let mod_ext = test Parse.extended_module_path "A.F(B.C(X)).G(Y).D"
+[%%expect{|
+val mod_ext : parse_result =
+  {flat =
+    `Ldot
+      (`Ldot
+         (`Ldot
+            (`Ldot
+               (`Lident
+                  {Location.txt = "A";
+                   loc =
+                    {Location.loc_start =
+                      {Lexing.pos_fname = "_none_"; pos_lnum = 0;
+                       pos_bol = 0; pos_cnum = -1};
+                     loc_end =
+                      {Lexing.pos_fname = "_none_"; pos_lnum = 0;
+                       pos_bol = 0; pos_cnum = -1};
+                     loc_ghost = true}},
+                {Location.txt = "F(B";
                  loc =
                   {Location.loc_start =
-                    {Lexing.pos_fname = ""; pos_lnum = 1; pos_bol = 0;
-                     pos_cnum = 4};
+                    {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0;
+                     pos_cnum = -1};
                    loc_end =
-                    {Lexing.pos_fname = ""; pos_lnum = 1; pos_bol = 0;
-                     pos_cnum = 5};
-                   loc_ghost = false}},
-              {Location.txt = "C";
-               loc =
-                {Location.loc_start =
-                  {Lexing.pos_fname = ""; pos_lnum = 1; pos_bol = 0;
-                   pos_cnum = 6};
-                 loc_end =
-                  {Lexing.pos_fname = ""; pos_lnum = 1; pos_bol = 0;
-                   pos_cnum = 7};
-                 loc_ghost = false}}),
-            L.Lident
-             {Location.txt = "X";
+                    {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0;
+                     pos_cnum = -1};
+                   loc_ghost = true}}),
+             {Location.txt = "C(X))";
+              loc =
+               {Location.loc_start =
+                 {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0;
+                  pos_cnum = -1};
+                loc_end =
+                 {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0;
+                  pos_cnum = -1};
+                loc_ghost = true}}),
+          {Location.txt = "G(Y)";
+           loc =
+            {Location.loc_start =
+              {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0;
+               pos_cnum = -1};
+             loc_end =
+              {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0;
+               pos_cnum = -1};
+             loc_ghost = true}}),
+       {Location.txt = "D";
+        loc =
+         {Location.loc_start =
+           {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0;
+            pos_cnum = -1};
+          loc_end =
+           {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0;
+            pos_cnum = -1};
+          loc_ghost = true}});
+   spec =
+    `Ldot
+      (`Lapply
+         (`Ldot
+            (`Lapply
+               (`Ldot
+                  (`Lident
+                     {Location.txt = "A";
+                      loc =
+                       {Location.loc_start =
+                         {Lexing.pos_fname = ""; pos_lnum = 1; pos_bol = 0;
+                          pos_cnum = 0};
+                        loc_end =
+                         {Lexing.pos_fname = ""; pos_lnum = 1; pos_bol = 0;
+                          pos_cnum = 1};
+                        loc_ghost = false}},
+                   {Location.txt = "F";
+                    loc =
+                     {Location.loc_start =
+                       {Lexing.pos_fname = ""; pos_lnum = 1; pos_bol = 0;
+                        pos_cnum = 2};
+                      loc_end =
+                       {Lexing.pos_fname = ""; pos_lnum = 1; pos_bol = 0;
+                        pos_cnum = 3};
+                      loc_ghost = false}}),
+                `Lapply
+                  (`Ldot
+                     (`Lident
+                        {Location.txt = "B";
+                         loc =
+                          {Location.loc_start =
+                            {Lexing.pos_fname = ""; pos_lnum = 1;
+                             pos_bol = 0; pos_cnum = 4};
+                           loc_end =
+                            {Lexing.pos_fname = ""; pos_lnum = 1;
+                             pos_bol = 0; pos_cnum = 5};
+                           loc_ghost = false}},
+                      {Location.txt = "C";
+                       loc =
+                        {Location.loc_start =
+                          {Lexing.pos_fname = ""; pos_lnum = 1; pos_bol = 0;
+                           pos_cnum = 6};
+                         loc_end =
+                          {Lexing.pos_fname = ""; pos_lnum = 1; pos_bol = 0;
+                           pos_cnum = 7};
+                         loc_ghost = false}}),
+                   `Lident
+                     {Location.txt = "X";
+                      loc =
+                       {Location.loc_start =
+                         {Lexing.pos_fname = ""; pos_lnum = 1; pos_bol = 0;
+                          pos_cnum = 8};
+                        loc_end =
+                         {Lexing.pos_fname = ""; pos_lnum = 1; pos_bol = 0;
+                          pos_cnum = 9};
+                        loc_ghost = false}})),
+             {Location.txt = "G";
               loc =
                {Location.loc_start =
                  {Lexing.pos_fname = ""; pos_lnum = 1; pos_bol = 0;
-                  pos_cnum = 8};
+                  pos_cnum = 12};
                 loc_end =
                  {Lexing.pos_fname = ""; pos_lnum = 1; pos_bol = 0;
-                  pos_cnum = 9};
-                loc_ghost = false}})),
-         {Location.txt = "G";
-          loc =
-           {Location.loc_start =
-             {Lexing.pos_fname = ""; pos_lnum = 1; pos_bol = 0;
-              pos_cnum = 12};
-            loc_end =
-             {Lexing.pos_fname = ""; pos_lnum = 1; pos_bol = 0;
-              pos_cnum = 13};
-            loc_ghost = false}}),
-       L.Lident
-        {Location.txt = "Y";
-         loc =
-          {Location.loc_start =
-            {Lexing.pos_fname = ""; pos_lnum = 1; pos_bol = 0; pos_cnum = 14};
-           loc_end =
-            {Lexing.pos_fname = ""; pos_lnum = 1; pos_bol = 0; pos_cnum = 15};
-           loc_ghost = false}}),
-     {Location.txt = "D";
-      loc =
-       {Location.loc_start =
-         {Lexing.pos_fname = ""; pos_lnum = 1; pos_bol = 0; pos_cnum = 17};
-        loc_end =
-         {Lexing.pos_fname = ""; pos_lnum = 1; pos_bol = 0; pos_cnum = 18};
-        loc_ghost = false}});
+                  pos_cnum = 13};
+                loc_ghost = false}}),
+          `Lident
+            {Location.txt = "Y";
+             loc =
+              {Location.loc_start =
+                {Lexing.pos_fname = ""; pos_lnum = 1; pos_bol = 0;
+                 pos_cnum = 14};
+               loc_end =
+                {Lexing.pos_fname = ""; pos_lnum = 1; pos_bol = 0;
+                 pos_cnum = 15};
+               loc_ghost = false}}),
+       {Location.txt = "D";
+        loc =
+         {Location.loc_start =
+           {Lexing.pos_fname = ""; pos_lnum = 1; pos_bol = 0; pos_cnum = 17};
+          loc_end =
+           {Lexing.pos_fname = ""; pos_lnum = 1; pos_bol = 0; pos_cnum = 18};
+          loc_ghost = false}});
    any_is_correct = true}
 |}]
 
@@ -785,5 +795,8 @@ let str_complex = string_of_longident
    (let (&.) p word = L.Ldot(p, mknoloc word) in
     L.Lapply(L.Lident (mknoloc "M") &. "F", L.Lident (mknoloc "M") &. "N") &. "N" &. "foo")
 [%%expect{|
-val str_complex : string = "M.F(M.N).N.foo"
+Line 2, characters 22-28:
+2 |    (let (&.) p word = L.Ldot(p, mknoloc word) in
+                          ^^^^^^
+Error: Unbound constructor "L.Ldot"
 |}]

@@ -17,7 +17,6 @@
 
 open Misc
 open Format
-open Longident
 open Path
 open Types
 open Outcometree
@@ -211,7 +210,7 @@ module Make(O : OBJ)(EVP : EVALPATH with type valu = O.t) = struct
       | Pdot(p, _s) ->
           if
             let id = Location.mknoloc (Out_name.print name) in
-            match get_desc (find (Lident id) env) with
+            match get_desc (find (`Lident id) env) with
             | Tconstr(ty_path', _, _) -> Path.same ty_path ty_path'
             | _ -> false
             | exception Not_found -> false
