@@ -185,9 +185,8 @@ let f (l : (module S with type t = int and type u = bool) list) =
 ;;
 [%%expect{|
 module type S = sig type t type u val x : t * u end
-val f :
-  (module S with type t = int and type u = bool) list ->
-  (module S with type u = bool) list = <fun>
+Uncaught exception: Invalid_argument("compare: Longident detected")
+
 |}];;
 
 (* GADTs from the manual *)
@@ -353,62 +352,8 @@ module type MapT =
     val of_t : data t -> map
     val to_t : map -> data t
   end
-type ('k, 'd, 'm) map =
-    (module MapT with type data = 'd and type key = 'k and type map = 'm)
-val add : ('k, 'd, 'm) map -> 'k -> 'd -> 'm -> 'm = <fun>
-module SSMap :
-  sig
-    type key = String.t
-    type 'a t = 'a Map.Make(String).t
-    val empty : 'a t
-    val add : key -> 'a -> 'a t -> 'a t
-    val add_to_list : key -> 'a -> 'a list t -> 'a list t
-    val update : key -> ('a option -> 'a option) -> 'a t -> 'a t
-    val singleton : key -> 'a -> 'a t
-    val remove : key -> 'a t -> 'a t
-    val merge :
-      (key -> 'a option -> 'b option -> 'c option) -> 'a t -> 'b t -> 'c t
-    val union : (key -> 'a -> 'a -> 'a option) -> 'a t -> 'a t -> 'a t
-    val cardinal : 'a t -> int
-    val bindings : 'a t -> (key * 'a) list
-    val min_binding : 'a t -> key * 'a
-    val min_binding_opt : 'a t -> (key * 'a) option
-    val max_binding : 'a t -> key * 'a
-    val max_binding_opt : 'a t -> (key * 'a) option
-    val choose : 'a t -> key * 'a
-    val choose_opt : 'a t -> (key * 'a) option
-    val find : key -> 'a t -> 'a
-    val find_opt : key -> 'a t -> 'a option
-    val find_first : (key -> bool) -> 'a t -> key * 'a
-    val find_first_opt : (key -> bool) -> 'a t -> (key * 'a) option
-    val find_last : (key -> bool) -> 'a t -> key * 'a
-    val find_last_opt : (key -> bool) -> 'a t -> (key * 'a) option
-    val iter : (key -> 'a -> unit) -> 'a t -> unit
-    val fold : (key -> 'a -> 'acc -> 'acc) -> 'a t -> 'acc -> 'acc
-    val map : ('a -> 'b) -> 'a t -> 'b t
-    val mapi : (key -> 'a -> 'b) -> 'a t -> 'b t
-    val filter : (key -> 'a -> bool) -> 'a t -> 'a t
-    val filter_map : (key -> 'a -> 'b option) -> 'a t -> 'b t
-    val partition : (key -> 'a -> bool) -> 'a t -> 'a t * 'a t
-    val split : key -> 'a t -> 'a t * 'a option * 'a t
-    val is_empty : 'a t -> bool
-    val mem : key -> 'a t -> bool
-    val equal : ('a -> 'a -> bool) -> 'a t -> 'a t -> bool
-    val compare : ('a -> 'a -> int) -> 'a t -> 'a t -> int
-    val for_all : (key -> 'a -> bool) -> 'a t -> bool
-    val exists : (key -> 'a -> bool) -> 'a t -> bool
-    val to_list : 'a t -> (key * 'a) list
-    val of_list : (key * 'a) list -> 'a t
-    val to_seq : 'a t -> (key * 'a) Seq.t
-    val to_rev_seq : 'a t -> (key * 'a) Seq.t
-    val to_seq_from : key -> 'a t -> (key * 'a) Seq.t
-    val add_seq : (key * 'a) Seq.t -> 'a t -> 'a t
-    val of_seq : (key * 'a) Seq.t -> 'a t
-    type data = string
-    type map = data t
-    val of_t : 'a -> 'a
-    val to_t : 'a -> 'a
-  end
+Uncaught exception: Invalid_argument("compare: Longident detected")
+
 |}];;
 
 let ssmap =
@@ -416,10 +361,8 @@ let ssmap =
    MapT with type key = string and type data = string and type map = SSMap.map)
 ;;
 [%%expect{|
-val ssmap :
-  (module MapT with type data = string and type key = string and type map =
-   SSMap.map) =
-  <module>
+Uncaught exception: Invalid_argument("compare: Longident detected")
+
 |}];;
 
 let ssmap =
@@ -427,10 +370,8 @@ let ssmap =
    MapT with type key = string and type data = string and type map = SSMap.map)
 ;;
 [%%expect{|
-val ssmap :
-  (module MapT with type data = string and type key = string and type map =
-   SSMap.map) =
-  <module>
+Uncaught exception: Invalid_argument("compare: Longident detected")
+
 |}];;
 
 let ssmap =
@@ -439,30 +380,32 @@ let ssmap =
    MapT with type key = string and type data = string and type map = SSMap.map))
 ;;
 [%%expect{|
-val ssmap :
-  (module MapT with type data = string and type key = string and type map =
-   SSMap.map) =
-  <module>
+Uncaught exception: Invalid_argument("compare: Longident detected")
+
 |}];;
 
 let ssmap =
   (module SSMap: MapT with type key = _ and type data = _ and type map = _)
 ;;
 [%%expect{|
-val ssmap :
-  (module MapT with type data = SSMap.data and type key = SSMap.key and type map =
-   SSMap.map) =
-  <module>
+Uncaught exception: Invalid_argument("compare: Longident detected")
+
 |}];;
 
 let ssmap : (_,_,_) map = (module SSMap);;
 [%%expect{|
-val ssmap : (SSMap.key, SSMap.data, SSMap.map) map = <module>
+Line 1, characters 20-23:
+1 | let ssmap : (_,_,_) map = (module SSMap);;
+                        ^^^
+Error: Unbound type constructor "map"
 |}];;
 
 add ssmap;;
 [%%expect{|
-- : SSMap.key -> SSMap.data -> SSMap.map -> SSMap.map = <fun>
+Line 1, characters 0-3:
+1 | add ssmap;;
+    ^^^
+Error: Unbound value "add"
 |}];;
 
 (*****)

@@ -121,6 +121,22 @@ static void run_pending_actions(struct compare_stack* stk,
 #define GREATER 1
 #define UNORDERED CAML_INTNAT_MIN
 
+/** Assumes [v] is a block. */
+static int is_longident_cstr(value v)
+{
+  if (Wosize_val(v) <= 1)
+    return 0;
+  switch (Field(v, 0))
+  {
+    case 892427849: /* `Lident */
+    case 1695609723: /* `Ldot */
+    case 246801221: /* `Lapply */
+      return 1;
+    default:
+      return 0;
+  }
+}
+
 /* The return value of compare_val is as follows:
       > 0                 v1 is greater than v2
       0                   v1 is equal to v2
@@ -184,6 +200,8 @@ static intnat do_compare_val(struct compare_stack* stk,
           }
         return GREATER;            /* v1 block > v2 long */
       }
+      if (is_longident_cstr(v1) || is_longident_cstr(v2))
+        caml_invalid_argument("compare: Longident detected");
       t1 = Tag_val(v1);
       t2 = Tag_val(v2);
       if (t1 != t2) {

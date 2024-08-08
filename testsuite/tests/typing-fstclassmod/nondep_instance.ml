@@ -29,13 +29,8 @@ module type Linear_map = sig
     'l -> ('a, 'a) t
 end;;
 [%%expect{|
-module type Linear_map =
-  sig
-    type ('a, 'b) t
-    val scale :
-      (module Vector_space with type scalar = 'l and type t = 'a) ->
-      'l -> ('a, 'a) t
-  end
+Uncaught exception: Invalid_argument("compare: Longident detected")
+
 |}];;
 
 module Primitive(Linear_map : Linear_map) = struct
@@ -43,10 +38,8 @@ module Primitive(Linear_map : Linear_map) = struct
     Linear_map.scale s x
 end;;
 [%%expect{|
-Line 3, characters 21-22:
-3 |     Linear_map.scale s x
-                         ^
-Error: This expression has type "(module Scalar with type t = s)"
-       but an expression was expected of type
-         "(module Vector_space with type scalar = 'a and type t = 'b)"
+Line 1, characters 30-40:
+1 | module Primitive(Linear_map : Linear_map) = struct
+                                  ^^^^^^^^^^
+Error: Unbound module type "Linear_map"
 |}];;

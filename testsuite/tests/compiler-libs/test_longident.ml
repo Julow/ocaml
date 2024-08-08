@@ -155,617 +155,50 @@ Syntaxerr.Error
 |}]
 let parse_ident = test Parse.val_ident "foo"
 [%%expect {|
-val parse_ident : parse_result =
-  {flat =
-    `Lident
-      {Location.txt = "foo";
-       loc =
-        {Location.loc_start =
-          {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0;
-           pos_cnum = -1};
-         loc_end =
-          {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0;
-           pos_cnum = -1};
-         loc_ghost = true}};
-   spec =
-    `Lident
-      {Location.txt = "foo";
-       loc =
-        {Location.loc_start =
-          {Lexing.pos_fname = ""; pos_lnum = 1; pos_bol = 0; pos_cnum = 0};
-         loc_end =
-          {Lexing.pos_fname = ""; pos_lnum = 1; pos_bol = 0; pos_cnum = 3};
-         loc_ghost = false}};
-   any_is_correct = true}
+Exception: Invalid_argument "compare: Longident detected".
 |}]
 let parse_dot = test Parse.val_ident "M.foo"
 [%%expect {|
-val parse_dot : parse_result =
-  {flat =
-    `Ldot
-      (`Lident
-         {Location.txt = "M";
-          loc =
-           {Location.loc_start =
-             {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0;
-              pos_cnum = -1};
-            loc_end =
-             {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0;
-              pos_cnum = -1};
-            loc_ghost = true}},
-       {Location.txt = "foo";
-        loc =
-         {Location.loc_start =
-           {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0;
-            pos_cnum = -1};
-          loc_end =
-           {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0;
-            pos_cnum = -1};
-          loc_ghost = true}});
-   spec =
-    `Ldot
-      (`Lident
-         {Location.txt = "M";
-          loc =
-           {Location.loc_start =
-             {Lexing.pos_fname = ""; pos_lnum = 1; pos_bol = 0; pos_cnum = 0};
-            loc_end =
-             {Lexing.pos_fname = ""; pos_lnum = 1; pos_bol = 0; pos_cnum = 1};
-            loc_ghost = false}},
-       {Location.txt = "foo";
-        loc =
-         {Location.loc_start =
-           {Lexing.pos_fname = ""; pos_lnum = 1; pos_bol = 0; pos_cnum = 2};
-          loc_end =
-           {Lexing.pos_fname = ""; pos_lnum = 1; pos_bol = 0; pos_cnum = 5};
-          loc_ghost = false}});
-   any_is_correct = true}
+Exception: Invalid_argument "compare: Longident detected".
 |}]
 let parse_path = test Parse.val_ident "M.N.foo"
 [%%expect {|
-val parse_path : parse_result =
-  {flat =
-    `Ldot
-      (`Ldot
-         (`Lident
-            {Location.txt = "M";
-             loc =
-              {Location.loc_start =
-                {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0;
-                 pos_cnum = -1};
-               loc_end =
-                {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0;
-                 pos_cnum = -1};
-               loc_ghost = true}},
-          {Location.txt = "N";
-           loc =
-            {Location.loc_start =
-              {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0;
-               pos_cnum = -1};
-             loc_end =
-              {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0;
-               pos_cnum = -1};
-             loc_ghost = true}}),
-       {Location.txt = "foo";
-        loc =
-         {Location.loc_start =
-           {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0;
-            pos_cnum = -1};
-          loc_end =
-           {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0;
-            pos_cnum = -1};
-          loc_ghost = true}});
-   spec =
-    `Ldot
-      (`Ldot
-         (`Lident
-            {Location.txt = "M";
-             loc =
-              {Location.loc_start =
-                {Lexing.pos_fname = ""; pos_lnum = 1; pos_bol = 0;
-                 pos_cnum = 0};
-               loc_end =
-                {Lexing.pos_fname = ""; pos_lnum = 1; pos_bol = 0;
-                 pos_cnum = 1};
-               loc_ghost = false}},
-          {Location.txt = "N";
-           loc =
-            {Location.loc_start =
-              {Lexing.pos_fname = ""; pos_lnum = 1; pos_bol = 0;
-               pos_cnum = 2};
-             loc_end =
-              {Lexing.pos_fname = ""; pos_lnum = 1; pos_bol = 0;
-               pos_cnum = 3};
-             loc_ghost = false}}),
-       {Location.txt = "foo";
-        loc =
-         {Location.loc_start =
-           {Lexing.pos_fname = ""; pos_lnum = 1; pos_bol = 0; pos_cnum = 4};
-          loc_end =
-           {Lexing.pos_fname = ""; pos_lnum = 1; pos_bol = 0; pos_cnum = 7};
-          loc_ghost = false}});
-   any_is_correct = true}
+Exception: Invalid_argument "compare: Longident detected".
 |}]
 let parse_complex = test  Parse.type_ident "M.F(M.N).N.foo"
 (* the result below is a known misbehavior of Longident.parse
    which does not handle applications properly. *)
 [%%expect {|
-val parse_complex : parse_result =
-  {flat =
-    `Ldot
-      (`Ldot
-         (`Ldot
-            (`Ldot
-               (`Lident
-                  {Location.txt = "M";
-                   loc =
-                    {Location.loc_start =
-                      {Lexing.pos_fname = "_none_"; pos_lnum = 0;
-                       pos_bol = 0; pos_cnum = -1};
-                     loc_end =
-                      {Lexing.pos_fname = "_none_"; pos_lnum = 0;
-                       pos_bol = 0; pos_cnum = -1};
-                     loc_ghost = true}},
-                {Location.txt = "F(M";
-                 loc =
-                  {Location.loc_start =
-                    {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0;
-                     pos_cnum = -1};
-                   loc_end =
-                    {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0;
-                     pos_cnum = -1};
-                   loc_ghost = true}}),
-             {Location.txt = "N)";
-              loc =
-               {Location.loc_start =
-                 {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0;
-                  pos_cnum = -1};
-                loc_end =
-                 {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0;
-                  pos_cnum = -1};
-                loc_ghost = true}}),
-          {Location.txt = "N";
-           loc =
-            {Location.loc_start =
-              {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0;
-               pos_cnum = -1};
-             loc_end =
-              {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0;
-               pos_cnum = -1};
-             loc_ghost = true}}),
-       {Location.txt = "foo";
-        loc =
-         {Location.loc_start =
-           {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0;
-            pos_cnum = -1};
-          loc_end =
-           {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0;
-            pos_cnum = -1};
-          loc_ghost = true}});
-   spec =
-    `Ldot
-      (`Ldot
-         (`Lapply
-            (`Ldot
-               (`Lident
-                  {Location.txt = "M";
-                   loc =
-                    {Location.loc_start =
-                      {Lexing.pos_fname = ""; pos_lnum = 1; pos_bol = 0;
-                       pos_cnum = 0};
-                     loc_end =
-                      {Lexing.pos_fname = ""; pos_lnum = 1; pos_bol = 0;
-                       pos_cnum = 1};
-                     loc_ghost = false}},
-                {Location.txt = "F";
-                 loc =
-                  {Location.loc_start =
-                    {Lexing.pos_fname = ""; pos_lnum = 1; pos_bol = 0;
-                     pos_cnum = 2};
-                   loc_end =
-                    {Lexing.pos_fname = ""; pos_lnum = 1; pos_bol = 0;
-                     pos_cnum = 3};
-                   loc_ghost = false}}),
-             `Ldot
-               (`Lident
-                  {Location.txt = "M";
-                   loc =
-                    {Location.loc_start =
-                      {Lexing.pos_fname = ""; pos_lnum = 1; pos_bol = 0;
-                       pos_cnum = 4};
-                     loc_end =
-                      {Lexing.pos_fname = ""; pos_lnum = 1; pos_bol = 0;
-                       pos_cnum = 5};
-                     loc_ghost = false}},
-                {Location.txt = "N";
-                 loc =
-                  {Location.loc_start =
-                    {Lexing.pos_fname = ""; pos_lnum = 1; pos_bol = 0;
-                     pos_cnum = 6};
-                   loc_end =
-                    {Lexing.pos_fname = ""; pos_lnum = 1; pos_bol = 0;
-                     pos_cnum = 7};
-                   loc_ghost = false}})),
-          {Location.txt = "N";
-           loc =
-            {Location.loc_start =
-              {Lexing.pos_fname = ""; pos_lnum = 1; pos_bol = 0;
-               pos_cnum = 9};
-             loc_end =
-              {Lexing.pos_fname = ""; pos_lnum = 1; pos_bol = 0;
-               pos_cnum = 10};
-             loc_ghost = false}}),
-       {Location.txt = "foo";
-        loc =
-         {Location.loc_start =
-           {Lexing.pos_fname = ""; pos_lnum = 1; pos_bol = 0; pos_cnum = 11};
-          loc_end =
-           {Lexing.pos_fname = ""; pos_lnum = 1; pos_bol = 0; pos_cnum = 14};
-          loc_ghost = false}});
-   any_is_correct = true}
+Exception: Invalid_argument "compare: Longident detected".
 |}]
 
 let parse_op = test Parse.val_ident "M.(.%.()<-)"
 (* the result below is another known misbehavior of Longident.parse. *)
 [%%expect {|
-val parse_op : parse_result =
-  {flat =
-    `Ldot
-      (`Ldot
-         (`Ldot
-            (`Lident
-               {Location.txt = "M";
-                loc =
-                 {Location.loc_start =
-                   {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0;
-                    pos_cnum = -1};
-                  loc_end =
-                   {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0;
-                    pos_cnum = -1};
-                  loc_ghost = true}},
-             {Location.txt = "(";
-              loc =
-               {Location.loc_start =
-                 {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0;
-                  pos_cnum = -1};
-                loc_end =
-                 {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0;
-                  pos_cnum = -1};
-                loc_ghost = true}}),
-          {Location.txt = "%";
-           loc =
-            {Location.loc_start =
-              {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0;
-               pos_cnum = -1};
-             loc_end =
-              {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0;
-               pos_cnum = -1};
-             loc_ghost = true}}),
-       {Location.txt = "()<-)";
-        loc =
-         {Location.loc_start =
-           {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0;
-            pos_cnum = -1};
-          loc_end =
-           {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0;
-            pos_cnum = -1};
-          loc_ghost = true}});
-   spec =
-    `Ldot
-      (`Lident
-         {Location.txt = "M";
-          loc =
-           {Location.loc_start =
-             {Lexing.pos_fname = ""; pos_lnum = 1; pos_bol = 0; pos_cnum = 0};
-            loc_end =
-             {Lexing.pos_fname = ""; pos_lnum = 1; pos_bol = 0; pos_cnum = 1};
-            loc_ghost = false}},
-       {Location.txt = ".%.()<-";
-        loc =
-         {Location.loc_start =
-           {Lexing.pos_fname = ""; pos_lnum = 1; pos_bol = 0; pos_cnum = 2};
-          loc_end =
-           {Lexing.pos_fname = ""; pos_lnum = 1; pos_bol = 0; pos_cnum = 11};
-          loc_ghost = false}});
-   any_is_correct = true}
+Exception: Invalid_argument "compare: Longident detected".
 |}]
 
 
 let parse_let_op = test Parse.val_ident "M.(let+*!)"
 [%%expect {|
-val parse_let_op : parse_result =
-  {flat =
-    `Ldot
-      (`Lident
-         {Location.txt = "M";
-          loc =
-           {Location.loc_start =
-             {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0;
-              pos_cnum = -1};
-            loc_end =
-             {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0;
-              pos_cnum = -1};
-            loc_ghost = true}},
-       {Location.txt = "(let+*!)";
-        loc =
-         {Location.loc_start =
-           {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0;
-            pos_cnum = -1};
-          loc_end =
-           {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0;
-            pos_cnum = -1};
-          loc_ghost = true}});
-   spec =
-    `Ldot
-      (`Lident
-         {Location.txt = "M";
-          loc =
-           {Location.loc_start =
-             {Lexing.pos_fname = ""; pos_lnum = 1; pos_bol = 0; pos_cnum = 0};
-            loc_end =
-             {Lexing.pos_fname = ""; pos_lnum = 1; pos_bol = 0; pos_cnum = 1};
-            loc_ghost = false}},
-       {Location.txt = "let+*!";
-        loc =
-         {Location.loc_start =
-           {Lexing.pos_fname = ""; pos_lnum = 1; pos_bol = 0; pos_cnum = 2};
-          loc_end =
-           {Lexing.pos_fname = ""; pos_lnum = 1; pos_bol = 0; pos_cnum = 10};
-          loc_ghost = false}});
-   any_is_correct = true}
+Exception: Invalid_argument "compare: Longident detected".
 |}]
 
 let constr = test Parse.constr_ident "true"
 [%%expect{|
-val constr : parse_result =
-  {flat =
-    `Lident
-      {Location.txt = "true";
-       loc =
-        {Location.loc_start =
-          {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0;
-           pos_cnum = -1};
-         loc_end =
-          {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0;
-           pos_cnum = -1};
-         loc_ghost = true}};
-   spec =
-    `Lident
-      {Location.txt = "true";
-       loc =
-        {Location.loc_start =
-          {Lexing.pos_fname = ""; pos_lnum = 1; pos_bol = 0; pos_cnum = 0};
-         loc_end =
-          {Lexing.pos_fname = ""; pos_lnum = 1; pos_bol = 0; pos_cnum = 4};
-         loc_ghost = false}};
-   any_is_correct = true}
+Exception: Invalid_argument "compare: Longident detected".
 |}]
 
 let prefix_constr = test Parse.constr_ident "A.B.C.(::)"
 [%%expect{|
-val prefix_constr : parse_result =
-  {flat =
-    `Ldot
-      (`Ldot
-         (`Ldot
-            (`Lident
-               {Location.txt = "A";
-                loc =
-                 {Location.loc_start =
-                   {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0;
-                    pos_cnum = -1};
-                  loc_end =
-                   {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0;
-                    pos_cnum = -1};
-                  loc_ghost = true}},
-             {Location.txt = "B";
-              loc =
-               {Location.loc_start =
-                 {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0;
-                  pos_cnum = -1};
-                loc_end =
-                 {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0;
-                  pos_cnum = -1};
-                loc_ghost = true}}),
-          {Location.txt = "C";
-           loc =
-            {Location.loc_start =
-              {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0;
-               pos_cnum = -1};
-             loc_end =
-              {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0;
-               pos_cnum = -1};
-             loc_ghost = true}}),
-       {Location.txt = "(::)";
-        loc =
-         {Location.loc_start =
-           {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0;
-            pos_cnum = -1};
-          loc_end =
-           {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0;
-            pos_cnum = -1};
-          loc_ghost = true}});
-   spec =
-    `Ldot
-      (`Ldot
-         (`Ldot
-            (`Lident
-               {Location.txt = "A";
-                loc =
-                 {Location.loc_start =
-                   {Lexing.pos_fname = ""; pos_lnum = 1; pos_bol = 0;
-                    pos_cnum = 0};
-                  loc_end =
-                   {Lexing.pos_fname = ""; pos_lnum = 1; pos_bol = 0;
-                    pos_cnum = 1};
-                  loc_ghost = false}},
-             {Location.txt = "B";
-              loc =
-               {Location.loc_start =
-                 {Lexing.pos_fname = ""; pos_lnum = 1; pos_bol = 0;
-                  pos_cnum = 2};
-                loc_end =
-                 {Lexing.pos_fname = ""; pos_lnum = 1; pos_bol = 0;
-                  pos_cnum = 3};
-                loc_ghost = false}}),
-          {Location.txt = "C";
-           loc =
-            {Location.loc_start =
-              {Lexing.pos_fname = ""; pos_lnum = 1; pos_bol = 0;
-               pos_cnum = 4};
-             loc_end =
-              {Lexing.pos_fname = ""; pos_lnum = 1; pos_bol = 0;
-               pos_cnum = 5};
-             loc_ghost = false}}),
-       {Location.txt = "::";
-        loc =
-         {Location.loc_start =
-           {Lexing.pos_fname = ""; pos_lnum = 1; pos_bol = 0; pos_cnum = 6};
-          loc_end =
-           {Lexing.pos_fname = ""; pos_lnum = 1; pos_bol = 0; pos_cnum = 10};
-          loc_ghost = false}});
-   any_is_correct = true}
+Exception: Invalid_argument "compare: Longident detected".
 |}]
 
 
 
 let mod_ext = test Parse.extended_module_path "A.F(B.C(X)).G(Y).D"
 [%%expect{|
-val mod_ext : parse_result =
-  {flat =
-    `Ldot
-      (`Ldot
-         (`Ldot
-            (`Ldot
-               (`Lident
-                  {Location.txt = "A";
-                   loc =
-                    {Location.loc_start =
-                      {Lexing.pos_fname = "_none_"; pos_lnum = 0;
-                       pos_bol = 0; pos_cnum = -1};
-                     loc_end =
-                      {Lexing.pos_fname = "_none_"; pos_lnum = 0;
-                       pos_bol = 0; pos_cnum = -1};
-                     loc_ghost = true}},
-                {Location.txt = "F(B";
-                 loc =
-                  {Location.loc_start =
-                    {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0;
-                     pos_cnum = -1};
-                   loc_end =
-                    {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0;
-                     pos_cnum = -1};
-                   loc_ghost = true}}),
-             {Location.txt = "C(X))";
-              loc =
-               {Location.loc_start =
-                 {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0;
-                  pos_cnum = -1};
-                loc_end =
-                 {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0;
-                  pos_cnum = -1};
-                loc_ghost = true}}),
-          {Location.txt = "G(Y)";
-           loc =
-            {Location.loc_start =
-              {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0;
-               pos_cnum = -1};
-             loc_end =
-              {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0;
-               pos_cnum = -1};
-             loc_ghost = true}}),
-       {Location.txt = "D";
-        loc =
-         {Location.loc_start =
-           {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0;
-            pos_cnum = -1};
-          loc_end =
-           {Lexing.pos_fname = "_none_"; pos_lnum = 0; pos_bol = 0;
-            pos_cnum = -1};
-          loc_ghost = true}});
-   spec =
-    `Ldot
-      (`Lapply
-         (`Ldot
-            (`Lapply
-               (`Ldot
-                  (`Lident
-                     {Location.txt = "A";
-                      loc =
-                       {Location.loc_start =
-                         {Lexing.pos_fname = ""; pos_lnum = 1; pos_bol = 0;
-                          pos_cnum = 0};
-                        loc_end =
-                         {Lexing.pos_fname = ""; pos_lnum = 1; pos_bol = 0;
-                          pos_cnum = 1};
-                        loc_ghost = false}},
-                   {Location.txt = "F";
-                    loc =
-                     {Location.loc_start =
-                       {Lexing.pos_fname = ""; pos_lnum = 1; pos_bol = 0;
-                        pos_cnum = 2};
-                      loc_end =
-                       {Lexing.pos_fname = ""; pos_lnum = 1; pos_bol = 0;
-                        pos_cnum = 3};
-                      loc_ghost = false}}),
-                `Lapply
-                  (`Ldot
-                     (`Lident
-                        {Location.txt = "B";
-                         loc =
-                          {Location.loc_start =
-                            {Lexing.pos_fname = ""; pos_lnum = 1;
-                             pos_bol = 0; pos_cnum = 4};
-                           loc_end =
-                            {Lexing.pos_fname = ""; pos_lnum = 1;
-                             pos_bol = 0; pos_cnum = 5};
-                           loc_ghost = false}},
-                      {Location.txt = "C";
-                       loc =
-                        {Location.loc_start =
-                          {Lexing.pos_fname = ""; pos_lnum = 1; pos_bol = 0;
-                           pos_cnum = 6};
-                         loc_end =
-                          {Lexing.pos_fname = ""; pos_lnum = 1; pos_bol = 0;
-                           pos_cnum = 7};
-                         loc_ghost = false}}),
-                   `Lident
-                     {Location.txt = "X";
-                      loc =
-                       {Location.loc_start =
-                         {Lexing.pos_fname = ""; pos_lnum = 1; pos_bol = 0;
-                          pos_cnum = 8};
-                        loc_end =
-                         {Lexing.pos_fname = ""; pos_lnum = 1; pos_bol = 0;
-                          pos_cnum = 9};
-                        loc_ghost = false}})),
-             {Location.txt = "G";
-              loc =
-               {Location.loc_start =
-                 {Lexing.pos_fname = ""; pos_lnum = 1; pos_bol = 0;
-                  pos_cnum = 12};
-                loc_end =
-                 {Lexing.pos_fname = ""; pos_lnum = 1; pos_bol = 0;
-                  pos_cnum = 13};
-                loc_ghost = false}}),
-          `Lident
-            {Location.txt = "Y";
-             loc =
-              {Location.loc_start =
-                {Lexing.pos_fname = ""; pos_lnum = 1; pos_bol = 0;
-                 pos_cnum = 14};
-               loc_end =
-                {Lexing.pos_fname = ""; pos_lnum = 1; pos_bol = 0;
-                 pos_cnum = 15};
-               loc_ghost = false}}),
-       {Location.txt = "D";
-        loc =
-         {Location.loc_start =
-           {Lexing.pos_fname = ""; pos_lnum = 1; pos_bol = 0; pos_cnum = 17};
-          loc_end =
-           {Lexing.pos_fname = ""; pos_lnum = 1; pos_bol = 0; pos_cnum = 18};
-          loc_ghost = false}});
-   any_is_correct = true}
+Exception: Invalid_argument "compare: Longident detected".
 |}]
 
 
@@ -779,15 +212,24 @@ val str_empty : string = ""
 |}]
 let str_ident   = string_of_longident parse_ident.flat
 [%%expect {|
-val str_ident : string = "foo"
+Line 1, characters 38-49:
+1 | let str_ident   = string_of_longident parse_ident.flat
+                                          ^^^^^^^^^^^
+Error: Unbound value "parse_ident"
 |}]
 let str_dot     = string_of_longident parse_dot.flat
 [%%expect {|
-val str_dot : string = "M.foo"
+Line 1, characters 38-47:
+1 | let str_dot     = string_of_longident parse_dot.flat
+                                          ^^^^^^^^^
+Error: Unbound value "parse_dot"
 |}]
 let str_path    = string_of_longident parse_path.flat
 [%%expect {|
-val str_path : string = "M.N.foo"
+Line 1, characters 38-48:
+1 | let str_path    = string_of_longident parse_path.flat
+                                          ^^^^^^^^^^
+Error: Unbound value "parse_path"
 |}]
 
 
