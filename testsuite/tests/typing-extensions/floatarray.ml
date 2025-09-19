@@ -42,6 +42,7 @@ Line 1, characters 51-52:
                                                        ^
 Error: The value "a" has type "'a array" but an expression was expected of type
          "Float.Array.t" = "floatarray"
+       because it is in a function application of type "Float.Array.t -> int"
 |}]
 
 type s = floatarray

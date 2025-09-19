@@ -154,7 +154,8 @@ Line 1, characters 20-21:
 1 | let () = Constr.put A;;
                         ^
 Error: This expression should not be a constructor, the expected type is
-       "unit -> Constr.t"
+       "unit -> Constr.t" because it is in a function application of type
+         "(unit -> Constr.t) -> unit"
 |}]
 
 let () = Record.put { a = 0; b = 0; c = 0 };;
@@ -163,7 +164,8 @@ Line 1, characters 20-43:
 1 | let () = Record.put { a = 0; b = 0; c = 0 };;
                         ^^^^^^^^^^^^^^^^^^^^^^^
 Error: This expression should not be a record, the expected type is
-       "unit -> Record.t"
+       "unit -> Record.t" because it is in a function application of type
+         "(unit -> Record.t) -> unit"
 |}]
 
 let () = Bool.put true;;
@@ -172,7 +174,8 @@ Line 1, characters 18-22:
 1 | let () = Bool.put true;;
                       ^^^^
 Error: This expression should not be a boolean literal, the expected type is
-       "unit -> Bool.t"
+       "unit -> Bool.t" because it is in a function application of type
+         "(unit -> Bool.t) -> unit"
 |}]
 
 let () = Bool.put false;;
@@ -181,7 +184,8 @@ Line 1, characters 18-23:
 1 | let () = Bool.put false;;
                       ^^^^^
 Error: This expression should not be a boolean literal, the expected type is
-       "unit -> Bool.t"
+       "unit -> Bool.t" because it is in a function application of type
+         "(unit -> Bool.t) -> unit"
 |}]
 
 let () = List.put [];;
@@ -190,7 +194,8 @@ Line 1, characters 18-20:
 1 | let () = List.put [];;
                       ^^
 Error: This expression should not be a list literal, the expected type is
-       "unit -> int List.t"
+       "unit -> int List.t" because it is in a function application of type
+         "(unit -> int List.t) -> unit"
 |}]
 
 let () = List.put (1 :: 2);;
@@ -199,7 +204,8 @@ Line 1, characters 18-26:
 1 | let () = List.put (1 :: 2);;
                       ^^^^^^^^
 Error: This expression should not be a list literal, the expected type is
-       "unit -> int List.t"
+       "unit -> int List.t" because it is in a function application of type
+         "(unit -> int List.t) -> unit"
 |}]
 
 let () = Unit.put ();;
@@ -208,7 +214,8 @@ Line 1, characters 18-20:
 1 | let () = Unit.put ();;
                       ^^
 Error: This expression should not be a unit literal, the expected type is
-       "unit -> Unit.t"
+       "unit -> Unit.t" because it is in a function application of type
+         "(unit -> Unit.t) -> unit"
 |}]
 
 let () =
@@ -245,5 +252,6 @@ Line 2, characters 13-29:
 2 |   Record.put { x with a = 5 };;
                  ^^^^^^^^^^^^^^^^
 Error: This expression should not be a record, the expected type is
-       "unit -> Record.t"
+       "unit -> Record.t" because it is in a function application of type
+         "(unit -> Record.t) -> unit"
 |}]

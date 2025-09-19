@@ -9,6 +9,8 @@ Line 1, characters 19-20:
                        ^
 Error: The constant "1" has type "int" but an expression was expected of type
          "int32"
+       because it is in a function application of type
+         "int32 -> int32 -> int32"
 Hint: Did you mean "1l"?
 |}]
 
@@ -39,6 +41,8 @@ Line 1, characters 15-16:
                    ^
 Error: The constant "7" has type "int" but an expression was expected of type
          "int64"
+       because it is in a function application of type
+         "int64 -> int64 -> int64"
 Hint: Did you mean "7L"?
 |}]
 
@@ -60,7 +64,9 @@ val x : int = 0
 Line 2, characters 19-20:
 2 | let _ = Int32.(add x 2l);;
                        ^
-Error: The value "x" has type "int" but an expression was expected of type "int32"
+Error: The value "x" has type "int" but an expression was expected of type "
+       int32" because it is in a function application of type
+         "int32 -> int32 -> int32"
 |}]
 
 (* pattern *)
@@ -153,6 +159,8 @@ Line 1, characters 23-28:
                            ^^^^^
 Error: The constant "1_000" has type "int" but an expression was expected of type
          "int64"
+       because it is in a function application of type
+         "int64 -> int64 -> int64"
 Hint: Did you mean "1_000L"?
 |}]
 let _ : nativeint * nativeint = 0n, 0xAA_BBL;;

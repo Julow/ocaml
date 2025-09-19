@@ -13,5 +13,6 @@ Line 1, characters 54-58:
                                                           ^^^^
 Error: The value "self" has type "< .. >" but an expression was expected of type
          "<  >"
+       because it is in a function application of type "<  > -> unit"
        Self type cannot be unified with a closed object type
 |}]

@@ -543,6 +543,8 @@ Line 4, characters 46-48:
                                                   ^^
 Error: This expression has type "int option"
        but an expression was expected of type "a option"
+       because it is in a function application of type
+         "a option ref -> a option -> unit"
        Type "int" is not compatible with type "a" = "int"
        This instance of "int" is ambiguous:
        it would escape the scope of its equation

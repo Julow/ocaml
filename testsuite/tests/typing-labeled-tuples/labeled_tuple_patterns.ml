@@ -169,7 +169,8 @@ let f (~(x:float),y) = x + y
 Line 1, characters 23-24:
 1 | let f (~(x:float),y) = x + y
                            ^
-Error: The value "x" has type "float" but an expression was expected of type "int"
+Error: The value "x" has type "float" but an expression was expected of type "
+       int" because it is in a function application of type "int -> int -> int"
 |}]
 (* Reordering in functions *)
 type xy = (x:int * y:int)
@@ -555,6 +556,7 @@ Line 4, characters 34-35:
                                       ^
 Error: The value "z" has type "y:int * x:int"
        but an expression was expected of type "x:int * y:int"
+       because it is in a function application of type "(x:int * y:int) -> int"
        Labels "y" and "x" do not match
 |}]
 

@@ -105,7 +105,8 @@ let f (type a) t (x : a) =
 Line 3, characters 17-18:
 3 |   | IntLit, n -> n+1
                      ^
-Error: The value "n" has type "a" but an expression was expected of type "int"
+Error: The value "n" has type "a" but an expression was expected of type "
+       int" because it is in a function application of type "int -> int -> int"
 |}]
 
 (**********************)

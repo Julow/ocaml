@@ -72,6 +72,7 @@ Line 1, characters 8-9:
             ^
 Error: The value x has type 'a Int.Map.t
        but an expression was expected of type int
+       because it is in a function application of type int -> int -> int
 module M : sig type t = A type u = C end
 module N : sig type t = B end
 - : M.t = A

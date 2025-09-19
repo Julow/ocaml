@@ -33,6 +33,7 @@ Line 1, characters 14-21:
                   ^^^^^^^
 Error: This expression has type "'a -> 'b"
        but an expression was expected of type "string"
+       because it is in a function application of type "string -> unit"
 Hint: This function application is partial, maybe some arguments are missing.
 |}];;
 

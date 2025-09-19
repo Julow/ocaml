@@ -287,6 +287,8 @@ Line 4, characters 30-31:
                                   ^
 Error: The value "x" has type "[ `A | `R of rt ]"
        but an expression was expected of type "[< `A | `R of 'a ] as 'a"
+       because it is in a function application of type
+         "([< `A | `R of 'a ] as 'a) -> int"
        Type "rt" = "[ `A | `B of string | `R of rt ]" is not compatible with type
          "[< `A | `R of 'a ] as 'a"
        The second variant type does not allow tag(s) "`B"

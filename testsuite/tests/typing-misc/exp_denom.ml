@@ -12,6 +12,7 @@ Line 1, characters 38-41:
                                           ^^^
 Error: The method call "x#m" has type "float"
        but an expression was expected of type "int"
+       because it is in a function application of type "int -> unit"
 |}]
 
 type r = { f : float }
@@ -25,6 +26,7 @@ Line 3, characters 26-29:
                               ^^^
 Error: The field access "x.f" has type "float"
        but an expression was expected of type "int"
+       because it is in a function application of type "int -> unit"
 |}]
 
 type v = Cons
@@ -36,7 +38,8 @@ type v = Cons
 Line 3, characters 18-22:
 3 | let _ = print_int Cons
                       ^^^^
-Error: This expression should not be a constructor, the expected type is "int"
+Error: This expression should not be a constructor, the expected type is "
+       int" because it is in a function application of type "int -> unit"
 |}]
 
 let _ = print_int `Cons
@@ -47,6 +50,7 @@ Line 1, characters 18-23:
                       ^^^^^
 Error: The constructor "`Cons" has type "[> `Cons ]"
        but an expression was expected of type "int"
+       because it is in a function application of type "int -> unit"
 |}]
 
 let v = 0.
@@ -57,7 +61,8 @@ val v : float = 0.
 Line 2, characters 18-19:
 2 | let _ = print_int v
                       ^
-Error: The value "v" has type "float" but an expression was expected of type "int"
+Error: The value "v" has type "float" but an expression was expected of type "
+       int" because it is in a function application of type "int -> unit"
 |}]
 
 let _ = print_int 0.
@@ -68,6 +73,7 @@ Line 1, characters 18-20:
                       ^^
 Error: The constant "0." has type "float" but an expression was expected of type
          "int"
+       because it is in a function application of type "int -> unit"
 |}]
 
 let _ = print_int "foo"
@@ -78,6 +84,7 @@ Line 1, characters 18-23:
                       ^^^^^
 Error: This constant has type "string" but an expression was expected of type
          "int"
+       because it is in a function application of type "int -> unit"
 |}]
 
 let _ : int = while false do () done

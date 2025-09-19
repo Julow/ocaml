@@ -51,7 +51,8 @@ type pair = Pair : 'a ty * 'a -> pair
 Line 9, characters 22-23:
 9 |   | Pair (Char, x) -> x + 1
                           ^
-Error: The value "x" has type "$a" but an expression was expected of type "int"
+Error: The value "x" has type "$a" but an expression was expected of type "
+       int" because it is in a function application of type "int -> int -> int"
        Hint: "$a" is an existential type bound by the constructor "Pair".
 |}]
 

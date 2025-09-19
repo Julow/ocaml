@@ -266,6 +266,7 @@ Line 2, characters 26-35:
                               ^^^^^^^^^
 Error: This constant has type "string" but an expression was expected of type
          "int"
+       because it is in a function application of type "int -> 'a"
 |}];;
 
 (* Functions with polymorphic parameters are separate from other functions *)
