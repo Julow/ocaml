@@ -6039,7 +6039,9 @@ and type_application env app_loc funct sargs =
                   (Optional "opt", Arg (Eliminated_optional_arg baz));
                   (Nolabel, Arg (Known_arg n))]] *)
       let explanation = Argument_of_function ty in
-      let args = List.map (fun arg -> type_apply_arg ~explanation ~app_loc env arg) args in
+      let args =
+        List.map (fun arg -> type_apply_arg ~explanation ~app_loc env arg)
+          args in
       (* example: type-check [n] and generate [None] for [?opt].
          [args] becomes [(Label "a", Omitted bar);
                          (Optional "opt", Arg None);
