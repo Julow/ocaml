@@ -106,7 +106,8 @@ Line 3, characters 17-18:
 3 |   | IntLit, n -> n+1
                      ^
 Error: The value "n" has type "a" but an expression was expected of type "
-       int" because it is in a function application of type "int -> int -> int"
+       int" because it is the argument "1" in a function application of type
+         "int -> int -> int"
 |}]
 
 (**********************)

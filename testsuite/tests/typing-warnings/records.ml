@@ -109,7 +109,8 @@ Line 3, characters 35-36:
 3 |   let f r = match r with {x; y} -> y + y
                                        ^
 Error: The value "y" has type "bool" but an expression was expected of type "
-       int" because it is in a function application of type "int -> int -> int"
+       int" because it is the argument "1" in a function application of type
+         "int -> int -> int"
 |}]
 
 module F2 = struct

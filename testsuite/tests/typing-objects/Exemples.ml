@@ -209,7 +209,7 @@ Line 1, characters 27-28:
                                ^
 Error: The value "p" has type "point" but an expression was expected of type
          "#color_point"
-       because it is in a function application of type
+       because it is the argument "1" in a function application of type
          "(#color_point as 'a) -> 'a color_circle"
        The first object type has no method "color"
 |}];;
@@ -595,7 +595,8 @@ Error: The value "c3" has type
            "< cmp : int_comparable -> int; setx : int -> unit; x : int >"
        but an expression was expected of type
          "#comparable as 'a" = "< cmp : 'a -> int; .. >"
-       because it is in a function application of type "#comparable -> unit"
+       because it is the argument "1" in a function application of type
+         "#comparable -> unit"
        Type "int_comparable" = "< cmp : int_comparable -> int; x : int >"
        is not compatible with type
          "#comparable as 'a" = "< cmp : 'a -> int; .. >"

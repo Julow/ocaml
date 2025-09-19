@@ -57,7 +57,7 @@ Line 1, characters 15-30:
 Error: This expression has type "'a -> 'b"
        but an expression was expected of type
          "(?x:'c -> 'a -> 'b as 'c) option"
-       because it is in a function application of type
+       because it is the argument "1" in a function application of type
          "?x:'a -> 'b -> 'c as 'a"
 Hint: This function application is partial, maybe some arguments are missing.
 |}]

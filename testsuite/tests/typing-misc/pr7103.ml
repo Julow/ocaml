@@ -25,7 +25,8 @@ Line 1, characters 27-28:
                                ^
 Error: The value "x" has type "a t" but an expression was expected of type
          "< .. > t"
-       because it is in a function application of type "< .. > t -> unit"
+       because it is the argument "1" in a function application of type
+         "< .. > t -> unit"
        Type "a" is not compatible with type "< .. >"
 |}];;
 
@@ -36,7 +37,8 @@ Line 1, characters 27-28:
                                ^
 Error: The value "x" has type "a t" but an expression was expected of type
          "[< `b ] t"
-       because it is in a function application of type "[< `b ] t -> unit"
+       because it is the argument "1" in a function application of type
+         "[< `b ] t -> unit"
        Type "a" is not compatible with type "[< `b ]"
 |}];;
 
@@ -47,6 +49,7 @@ Line 1, characters 27-28:
                                ^
 Error: The value "x" has type "a t" but an expression was expected of type
          "[> `b ] t"
-       because it is in a function application of type "[> `b ] t -> unit"
+       because it is the argument "1" in a function application of type
+         "[> `b ] t -> unit"
        Type "a" is not compatible with type "[> `b ]"
 |}];;

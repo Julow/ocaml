@@ -32,7 +32,7 @@ Line 1, characters 4-23:
 1 | foo (fun ?opt () -> ()) ;; (* fails *)
         ^^^^^^^^^^^^^^^^^^^
 Error: This function should have type "unit -> unit"
-         because it is in a function application of type
+         because it is the argument "1" in a function application of type
            "(unit -> unit) -> unit"
        but its first argument is labeled "?opt" instead of being unlabeled
 |}];;
@@ -185,7 +185,7 @@ Line 1, characters 24-33:
                             ^^^^^^^^^
 Error: The value "unlabeled" has type "'a -> unit"
        but an expression was expected of type "x:'b -> unit"
-       because it is in a function application of type
+       because it is the argument "1" in a function application of type
          "(x:'a -> unit) -> 'a -> unit"
        A label "x" was expected
 |}]
@@ -197,7 +197,7 @@ Line 1, characters 24-35:
                             ^^^^^^^^^^^
 Error: The value "wrong_label" has type "y:'a -> unit"
        but an expression was expected of type "x:'b -> unit"
-       because it is in a function application of type
+       because it is the argument "1" in a function application of type
          "(x:'a -> unit) -> 'a -> unit"
        Labels "y" and "x" do not match
 |}]

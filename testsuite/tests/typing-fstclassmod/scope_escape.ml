@@ -101,5 +101,6 @@ Line 15, characters 8-10:
              ^^
 Error: The constructor "()" has type "unit"
        but an expression was expected of type "M.t"
-       because it is in a function application of type "M.t -> M.t"
+       because it is the argument "1" in a function application of type
+         "M.t -> M.t"
 |}];;
