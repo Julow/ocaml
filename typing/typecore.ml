@@ -40,7 +40,7 @@ type type_forcing_context =
   | Assert_condition
   | Sequence_left_hand_side
   | When_guard
-  | Argument_of_function of type_expr
+  | Argument_of_function of int * type_expr
 
 type type_expected = {
   ty: type_expr;
@@ -6038,9 +6038,10 @@ and type_application env app_loc funct sargs =
          [args = [(Label "a", Omitted bar);
                   (Optional "opt", Arg (Eliminated_optional_arg baz));
                   (Nolabel, Arg (Known_arg n))]] *)
-      let explanation = Argument_of_function ty in
       let args =
-        List.map (fun arg -> type_apply_arg ~explanation ~app_loc env arg)
+        List.mapi (fun i arg ->
+            let explanation = Argument_of_function (i, ty) in
+            type_apply_arg ~explanation ~app_loc env arg)
           args in
       (* example: type-check [n] and generate [None] for [?opt].
          [args] becomes [(Label "a", Omitted bar);
@@ -7116,30 +7117,31 @@ let report_pattern_type_clash_hints pat diff =
   | _ -> []
 
 let report_type_expected_explanation expl =
-  let because expl_str = doc_printf ("@ because it is in " ^^ expl_str) in
+  let because expl_str = doc_printf ("@ because it is " ^^ expl_str) in
   match expl with
   | If_conditional ->
-      because "the condition of an if-statement"
+      because "in the condition of an if-statement"
   | If_no_else_branch ->
-      because "the result of a conditional with no else branch"
+      because "in the result of a conditional with no else branch"
   | While_loop_conditional ->
-      because "the condition of a while-loop"
+      because "in the condition of a while-loop"
   | While_loop_body ->
-      because "the body of a while-loop"
+      because "in the body of a while-loop"
   | For_loop_start_index ->
-      because "a for-loop start index"
+      because "in a for-loop start index"
   | For_loop_stop_index ->
-      because "a for-loop stop index"
+      because "in a for-loop stop index"
   | For_loop_body ->
-      because "the body of a for-loop"
+      because "in the body of a for-loop"
   | Assert_condition ->
-      because "the condition of an assertion"
+      because "in the condition of an assertion"
   | Sequence_left_hand_side ->
-      because "the left-hand side of a sequence"
+      because "in the left-hand side of a sequence"
   | When_guard ->
-      because "a when-guard"
-  | Argument_of_function ty ->
-      because "a function application of type@;<1 2>%a"
+      because "in a when-guard"
+  | Argument_of_function (i, ty) ->
+      because "the argument %a in a function application of type@;<1 2>%a"
+        (Style.as_inline_code Format_doc.pp_print_int) (i + 1)
         (Style.as_inline_code Printtyp.type_expr) ty
 
 let report_type_expected_explanation_opt expl =
