@@ -40,6 +40,7 @@ type type_forcing_context =
   | Assert_condition
   | Sequence_left_hand_side
   | When_guard
+  | Argument_of_function of type_expr
 
 type type_expected = {
   ty: type_expr;
@@ -5923,10 +5924,10 @@ and type_argument ?explanation ?recarg env sarg ty_expected' ty_expected =
       unify_exp ~sexp:sarg env texp ty_expected;
       texp
 
-and type_apply_arg env ~app_loc (lbl, arg) =
+and type_apply_arg ?explanation env ~app_loc (lbl, arg) =
   match arg with
   | Arg (Unknown_arg { sarg; ty_arg }) ->
-      let arg = type_expect env sarg (mk_expected ty_arg) in
+      let arg = type_expect env sarg (mk_expected ?explanation ty_arg) in
       if is_optional lbl then
         unify_exp ~sexp:sarg env arg (type_option(newvar()));
       (lbl, Arg arg)
@@ -5937,11 +5938,11 @@ and type_apply_arg env ~app_loc (lbl, arg) =
           let ty_arg0' = tpoly_get_mono ty_arg0 in
           if wrapped_in_some then
             option_some env
-              (type_argument env sarg
+              (type_argument ?explanation env sarg
                  (extract_option_type env ty_arg')
                  (extract_option_type env ty_arg0'))
           else
-            type_argument env sarg ty_arg' ty_arg0'
+            type_argument ?explanation env sarg ty_arg' ty_arg0'
         end else begin
           if !Clflags.principal
              && get_level ty_arg < Btype.generic_level
@@ -5962,7 +5963,7 @@ and type_apply_arg env ~app_loc (lbl, arg) =
               let vars0, ty_arg0' = instance_poly_fixed vars0 ty_arg0' in
               List.iter2 (fun ty ty' -> unify_var env ty ty') vars vars0;
               let arg =
-                type_argument env sarg ty_arg' ty_arg0'
+                type_argument ?explanation env sarg ty_arg' ty_arg0'
               in
               arg, ty_arg, vars0
             end
@@ -6037,7 +6038,8 @@ and type_application env app_loc funct sargs =
          [args = [(Label "a", Omitted bar);
                   (Optional "opt", Arg (Eliminated_optional_arg baz));
                   (Nolabel, Arg (Known_arg n))]] *)
-      let args = List.map (fun arg -> type_apply_arg ~app_loc env arg) args in
+      let explanation = Argument_of_function ty in
+      let args = List.map (fun arg -> type_apply_arg ~explanation ~app_loc env arg) args in
       (* example: type-check [n] and generate [None] for [?opt].
          [args] becomes [(Label "a", Omitted bar);
                          (Optional "opt", Arg None);
@@ -7112,7 +7114,7 @@ let report_pattern_type_clash_hints pat diff =
   | _ -> []
 
 let report_type_expected_explanation expl =
-  let because expl_str = doc_printf "@ because it is in %s" expl_str in
+  let because expl_str = doc_printf ("@ because it is in " ^^ expl_str) in
   match expl with
   | If_conditional ->
       because "the condition of an if-statement"
@@ -7134,6 +7136,9 @@ let report_type_expected_explanation expl =
       because "the left-hand side of a sequence"
   | When_guard ->
       because "a when-guard"
+  | Argument_of_function ty ->
+      because "a function application of type@;<1 2>%a"
+        (Style.as_inline_code Printtyp.type_expr) ty
 
 let report_type_expected_explanation_opt expl =
   match expl with
