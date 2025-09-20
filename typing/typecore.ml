@@ -7105,9 +7105,39 @@ let report_partial_application = function
     end
   | None -> []
 
-let report_expr_type_clash_hints exp diff =
+(** Type error in an application argument, point to other argument with a
+    matching type. *)
+let report_inverted_argument_in_apply env _exp diff explanation =
+  let rec collect_matching_args acc got_type arg_number ty =
+    match get_desc ty with
+    | Tarrow (_, argt, tl, _) ->
+        let acc =
+          if Ctype.does_match env argt got_type then arg_number :: acc else acc
+        in
+        collect_matching_args acc got_type (arg_number + 1) tl
+    | _ -> []
+  in
+  match explanation, diff with
+  | Some (Argument_of_function { arg_number; funct }), Some diff -> begin
+      let got_type = Errortrace.(diff.got.expanded) in
+      match
+        collect_matching_args [] got_type 1 funct.exp_type
+      with
+      | [] -> []
+      | matching_arg_numbers ->
+          let plural = match matching_arg_numbers with [_] -> "" | _ -> "s" in
+          [ Location.msg
+              "@[<hv 0>Argument%s number %a match the type of argument %d.@ \
+               Did you interchange them ?@]" plural
+              Fmt.(pp_print_list pp_print_int) matching_arg_numbers
+              arg_number ]
+    end
+  | _ -> []
+
+let report_expr_type_clash_hints env exp diff explanation =
   match exp with
   | Some exp -> begin
+      report_inverted_argument_in_apply env exp diff explanation @
       match exp.pexp_desc with
       | Pexp_constant const -> report_literal_type_constraint const diff
       | Pexp_apply _ -> report_partial_application diff
@@ -7257,7 +7287,7 @@ let report_error ~loc env = function
        (spellcheck_idents id valid_idents)
   | Expr_type_clash (err, explanation, exp) ->
       let diff = type_clash_of_trace err.trace in
-      let sub = report_expr_type_clash_hints exp diff in
+      let sub = report_expr_type_clash_hints env exp diff explanation in
       report_unification_error ~loc ~sub env err
         ~type_expected_explanation:
           (report_type_expected_explanation_opt explanation)
