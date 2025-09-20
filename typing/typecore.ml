@@ -7037,7 +7037,7 @@ let pp_exp_denom ppf pexp =
 
 (** Implements the "This expression" message, printing the expression if it
     should be according to {!Parsetree.Doc.nominal_exp}. *)
-let report_this_pexp_has_type denom ppf exp =
+let report_this_pexp ?(capitalized=true) denom ppf exp =
   let denom ppf =
     match denom, exp with
     | Some d, _ -> fprintf ppf "%s" d
@@ -7047,11 +7047,15 @@ let report_this_pexp_has_type denom ppf exp =
   let nexp = Option.bind exp Pprintast.Doc.nominal_exp in
   match nexp with
   | Some nexp ->
-      fprintf ppf "The %t %a has type" denom (Style.as_inline_code pp_doc) nexp
-  | _ -> fprintf ppf "This %t has type" denom
+      let the = if capitalized then "The" else "the" in
+      fprintf ppf "%s %t %a" the denom (Style.as_inline_code pp_doc) nexp
+  | _ ->
+      let this = if capitalized then "This" else "this" in
+      fprintf ppf "%s %t" this denom
 
-let report_this_texp_has_type denom ppf texp =
-  report_this_pexp_has_type denom ppf (Some (Untypeast.untype_expression texp))
+let report_this_texp ?capitalized denom ppf texp =
+  report_this_pexp ?capitalized denom ppf
+    (Some (Untypeast.untype_expression texp))
 
 (* Hint on type error on integer literals
    To avoid confusion, it is disabled on float literals
@@ -7176,9 +7180,9 @@ let report_too_many_arg_error ~funct ~func_ty ~previous_arg_loc
       loc_ghost = false }
   in
   errorf ~loc:app_loc
-    "@[<v>@[<2>%a@ %a@]\
+    "@[<v>@[<2>%a has type@ %a@]\
      @ It is applied to too many arguments@]"
-    (report_this_texp_has_type (Some "function")) funct
+    (report_this_texp (Some "function")) funct
     Printtyp.type_expr func_ty
     ~sub:(
       let semicolon =
@@ -7257,7 +7261,7 @@ let report_error ~loc env = function
       report_unification_error ~loc ~sub env err
         ~type_expected_explanation:
           (report_type_expected_explanation_opt explanation)
-        (msg "%a" (report_this_pexp_has_type None) exp)
+        (msg "%a has type" (report_this_pexp None) exp)
         (msg "but an expression was expected of type");
   | Function_arity_type_clash {
       syntactic_arity; type_constraint; trace = { trace };
