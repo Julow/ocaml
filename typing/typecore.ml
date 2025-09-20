@@ -40,8 +40,7 @@ type type_forcing_context =
   | Assert_condition
   | Sequence_left_hand_side
   | When_guard
-  | Argument_of_function of {
-      arg_number : int; func_texp : expression; funct : type_expr }
+  | Argument_of_function of { arg_number : int; funct : Typedtree.expression }
 
 type type_expected = {
   ty: type_expr;
@@ -6041,8 +6040,7 @@ and type_application env func_texp funct sargs =
                   (Nolabel, Arg (Known_arg n))]] *)
       let args =
         List.mapi (fun arg_number arg ->
-            let explanation = Argument_of_function
-                { arg_number; func_texp; funct = ty } in
+            let explanation = Argument_of_function { arg_number; funct } in
             type_apply_arg ~explanation ~app_loc:func_texp.exp_loc env arg)
           args in
       (* example: type-check [n] and generate [None] for [?opt].
@@ -7145,10 +7143,10 @@ let report_type_expected_explanation expl =
       because "in the left-hand side of a sequence"
   | When_guard ->
       because "in a when-guard"
-  | Argument_of_function { arg_number; func_texp; funct = _ } ->
+  | Argument_of_function { arg_number; funct } ->
       because "the argument %a the application application@ of %a."
         (Style.as_inline_code Format_doc.pp_print_int) (arg_number + 1)
-        (report_this_texp ~capitalized:false (Some "function")) func_texp
+        (report_this_texp ~capitalized:false (Some "function")) funct
 
 let report_type_expected_explanation_opt expl =
   match expl with
