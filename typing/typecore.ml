@@ -40,7 +40,8 @@ type type_forcing_context =
   | Assert_condition
   | Sequence_left_hand_side
   | When_guard
-  | Argument_of_function of int * type_expr
+  | Argument_of_function of {
+      arg_number : int; func_texp : expression; funct : type_expr }
 
 type type_expected = {
   ty: type_expr;
@@ -4171,7 +4172,7 @@ and type_expect_
         | _ ->
             funct, sargs
       in
-      let (args, ty_res) = type_application env loc funct sargs in
+      let (args, ty_res) = type_application env funct funct sargs in
       rue {
         exp_desc = Texp_apply(funct, args);
         exp_loc = loc; exp_extra = [];
@@ -5982,7 +5983,7 @@ and type_apply_arg ?explanation env ~app_loc (lbl, arg) =
       (lbl, Arg arg)
   | Omitted _ as arg -> (lbl, arg)
 
-and type_application env app_loc funct sargs =
+and type_application env func_texp funct sargs =
   let exception Filter_arrow_mono_failed in
   let filter_arrow_mono env t l =
     match filter_arrow env t l ~param_hole:false with
@@ -6039,9 +6040,10 @@ and type_application env app_loc funct sargs =
                   (Optional "opt", Arg (Eliminated_optional_arg baz));
                   (Nolabel, Arg (Known_arg n))]] *)
       let args =
-        List.mapi (fun i arg ->
-            let explanation = Argument_of_function (i, ty) in
-            type_apply_arg ~explanation ~app_loc env arg)
+        List.mapi (fun arg_number arg ->
+            let explanation = Argument_of_function
+                { arg_number; func_texp; funct = ty } in
+            type_apply_arg ~explanation ~app_loc:func_texp.exp_loc env arg)
           args in
       (* example: type-check [n] and generate [None] for [?opt].
          [args] becomes [(Label "a", Omitted bar);
@@ -7143,10 +7145,10 @@ let report_type_expected_explanation expl =
       because "in the left-hand side of a sequence"
   | When_guard ->
       because "in a when-guard"
-  | Argument_of_function (i, ty) ->
-      because "the argument %a in a function application of type@;<1 2>%a"
-        (Style.as_inline_code Format_doc.pp_print_int) (i + 1)
-        (Style.as_inline_code Printtyp.type_expr) ty
+  | Argument_of_function { arg_number; func_texp; funct = _ } ->
+      because "the argument %a the application application@ of %a."
+        (Style.as_inline_code Format_doc.pp_print_int) (arg_number + 1)
+        (report_this_texp ~capitalized:false (Some "function")) func_texp
 
 let report_type_expected_explanation_opt expl =
   match expl with
