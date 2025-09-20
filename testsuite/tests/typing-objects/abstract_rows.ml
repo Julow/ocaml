@@ -12,8 +12,8 @@ Line 4, characters 24-25:
 4 | let f (x:t) (y:u) = x = y;;
                             ^
 Error: The value "y" has type "u" but an expression was expected of type "
-       t" because it is the argument "2" in a function application of type
-         "t -> t -> bool"
+       t" because it is the argument "2" the application application
+       of the function "(=)".
        The second object type has an abstract row, it cannot be closed
 |}]
 
@@ -24,7 +24,7 @@ Line 1, characters 24-25:
 1 | let g (x:u) (y:t) = x = y;;
                             ^
 Error: The value "y" has type "t" but an expression was expected of type "
-       u" because it is the argument "2" in a function application of type
-         "u -> u -> bool"
+       u" because it is the argument "2" the application application
+       of the function "(=)".
        The first object type has an abstract row, it cannot be closed
 |}]

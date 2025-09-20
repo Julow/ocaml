@@ -33,8 +33,8 @@ Line 1, characters 53-54:
 1 | fun b -> if true then (if b then ()) else (print_int b);;
                                                          ^
 Error: The value "b" has type "bool" but an expression was expected of type "
-       int" because it is the argument "1" in a function application of type
-         "int -> unit"
+       int" because it is the argument "1" the application application
+       of the function "print_int".
 |}];;
 
 if (let x = 3 in x) then ();;

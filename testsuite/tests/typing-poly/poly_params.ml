@@ -199,9 +199,9 @@ let non_principal1 p f =
 [%%expect {|
 val non_principal1 : bool -> (('a. 'a -> 'a) -> 'b) -> 'b = <fun>
 |}, Principal{|
-Line 3, characters 7-21:
+Line 3, characters 7-8:
 3 |   else f (fun x -> x)
-           ^^^^^^^^^^^^^^
+           ^
 Warning 18 [not-principal]: applying a higher-rank function here is not
   principal.
 
@@ -266,8 +266,8 @@ Line 2, characters 26-35:
                               ^^^^^^^^^
 Error: This constant has type "string" but an expression was expected of type
          "int"
-       because it is the argument "1" in a function application of type
-         "int -> 'a"
+       because it is the argument "1" the application application
+       of the function "y".
 |}];;
 
 (* Functions with polymorphic parameters are separate from other functions *)

@@ -38,8 +38,8 @@ Line 4, characters 49-50:
                                                      ^
 Error: The value "y" has type "< a : 'a; b : 'a >"
        but an expression was expected of type "< a : 'a; b : 'a0. 'a0 >"
-       because it is the argument "2" in a function application of type
-         "< a : 'a; b : 'a0. 'a0 > -> < a : 'a; b : 'a0. 'a0 > -> bool"
+       because it is the argument "2" the application application
+       of the function "(=)".
        The method "b" has type "'a", but the expected method type was "'a0. 'a0"
        The universal variable "'a0" would escape its scope
 |}]
@@ -62,8 +62,8 @@ Lines 5-7, characters 10-5:
 7 |  end)..
 Error: This expression has type "< f : 'a -> int >"
        but an expression was expected of type "t_a"
-       because it is the argument "1" in a function application of type
-         "t_a -> int"
+       because it is the argument "1" the application application
+       of the function "f".
        The method "f" has type "'a -> int", but the expected method type was
        "'a0. 'a0 -> int"
        The universal variable "'a0" would escape its scope
@@ -83,8 +83,8 @@ Line 4, characters 11-49:
                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Error: This expression has type "'a v" but an expression was expected of type
          "uv"
-       because it is the argument "1" in a function application of type
-         "uv -> int"
+       because it is the argument "1" the application application
+       of the function "f".
        The method "f" has type "'a -> int", but the expected method type was
        "'a0. 'a0 -> int"
        The universal variable "'a0" would escape its scope

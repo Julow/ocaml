@@ -13,8 +13,8 @@ Line 2, characters 10-11:
               ^
 Error: The constant "3" has type "int" but an expression was expected of type
          "unit -> 'a"
-       because it is the argument "1" in a function application of type
-         "(unit -> 'a) -> 'a"
+       because it is the argument "1" the application application
+       of the function "g".
        Hint: Did you forget to wrap the expression using "fun () ->"?
 |}];;
 
@@ -45,8 +45,8 @@ Line 2, characters 10-11:
               ^
 Error: The value "x" has type "unit -> int"
        but an expression was expected of type "int"
-       because it is the argument "1" in a function application of type
-         "int -> unit"
+       because it is the argument "1" the application application
+       of the function "print_int".
        Hint: Did you forget to provide "()" as argument?
 |}];;
 
@@ -60,8 +60,8 @@ Line 3, characters 6-7:
           ^
 Error: The constant "3" has type "int" but an expression was expected of type
          "unit -> 'a"
-       because it is the argument "2" in a function application of type
-         "(unit -> 'a) -> (unit -> 'a) -> bool"
+       because it is the argument "2" the application application
+       of the function "(=)".
        Hint: Did you forget to wrap the expression using "fun () ->"?
 |}];;
 
@@ -75,7 +75,7 @@ Line 3, characters 6-7:
           ^
 Error: The value "f" has type "unit -> 'a" but an expression was expected of type
          "int"
-       because it is the argument "2" in a function application of type
-         "int -> int -> bool"
+       because it is the argument "2" the application application
+       of the function "(=)".
        Hint: Did you forget to provide "()" as argument?
 |}]

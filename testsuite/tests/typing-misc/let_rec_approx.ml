@@ -19,8 +19,8 @@ Line 1, characters 17-19:
                      ^^
 Error: The constant "42" has type "int" but an expression was expected of type
          "string"
-       because it is the argument "1" in a function application of type
-         "string -> 'a"
+       because it is the argument "1" the application application
+       of the function "g".
 |}]
 
 let rec opt_error ?(opt : string) () = f ?opt ()

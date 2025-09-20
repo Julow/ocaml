@@ -26,8 +26,8 @@ Line 11, characters 27-29:
                                 ^^
 Error: The value "it" has type "[< `Bar | `Foo > `Bar ]"
        but an expression was expected of type "[< `Bar | `Foo ]"
-       because it is the argument "1" in a function application of type
-         "[< `Bar | `Foo ] -> int"
+       because it is the argument "1" the application application
+       of the function "f".
        The second variant type is bound to "$a",
        it may not allow the tag(s) "`Bar"
        Hint: "$a" is an existential type bound by the constructor "Aux".

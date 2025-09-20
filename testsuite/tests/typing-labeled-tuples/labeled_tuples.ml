@@ -164,8 +164,8 @@ Line 1, characters 23-37:
                            ^^^^^^^^^^^^^^
 Error: This expression has type "y:'a * x:'b"
        but an expression was expected of type "x:int * y:int"
-       because it is the argument "2" in a function application of type
-         "bool -> (x:int * y:int) -> x:int * y:int"
+       because it is the argument "2" the application application
+       of the function "choose_pt".
        Labels "y" and "x" do not match
 |}]
 

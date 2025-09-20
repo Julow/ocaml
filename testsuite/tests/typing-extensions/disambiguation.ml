@@ -74,8 +74,8 @@ Line 1, characters 6-15:
 1 | raise Not_Found;;
           ^^^^^^^^^
 Error: This variant expression is expected to have type "exn"
-       because it is the argument "1" in a function application of type
-         "exn -> 'a"
+       because it is the argument "1" the application application
+       of the function "raise".
        There is no constructor "Not_Found" within type "exn"
 Hint:             Did you mean "Not_found"?
 |}]
@@ -198,8 +198,8 @@ Line 3, characters 8-12:
 3 |   raise Locl;;
             ^^^^
 Error: This variant expression is expected to have type "exn"
-       because it is the argument "1" in a function application of type
-         "exn -> 'a"
+       because it is the argument "1" the application application
+       of the function "raise".
        There is no constructor "Locl" within type "exn"
 Hint:             Did you mean "Local"?
 |}]

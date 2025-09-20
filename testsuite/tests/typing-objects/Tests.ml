@@ -417,8 +417,8 @@ Line 1, characters 30-34:
 1 | class c () = object val x = - true val y = -. () end;;
                                   ^^^^
 Error: This expression should not be a boolean literal, the expected type is
-       "int" because it is the argument "1" in a function application of type
-         "int -> int"
+       "int" because it is the argument "1" the application application
+       of the function "(~-)".
 |}];;
 
 class c () = object method f = 1 method g = 1 method h = 1 end;;
@@ -1148,8 +1148,8 @@ Line 2, characters 54-58:
                                                           ^^^^
 Error: The value "self" has type "< .. >" but an expression was expected of type
          "<  >"
-       because it is the argument "1" in a function application of type
-         "<  > -> unit"
+       because it is the argument "1" the application application
+       of the function "is_empty".
        Self type cannot be unified with a closed object type
 |}];;
 
@@ -1244,8 +1244,8 @@ Line 1, characters 41-45:
                                              ^^^^
 Error: The value "self" has type "<  >" but an expression was expected of type
          "< foo : int; .. >"
-       because it is the argument "1" in a function application of type
-         "< foo : int; .. > -> unit"
+       because it is the argument "1" the application application
+       of the function "has_foo".
        The first object type has no method "foo"
 |}];;
 

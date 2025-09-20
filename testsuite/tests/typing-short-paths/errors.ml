@@ -52,8 +52,8 @@ Line 9, characters 22-23:
 9 |   | Pair (Char, x) -> x + 1
                           ^
 Error: The value "x" has type "$a" but an expression was expected of type "
-       int" because it is the argument "1" in a function application of type
-         "int -> int -> int"
+       int" because it is the argument "1" the application application
+       of the function "(+)".
        Hint: "$a" is an existential type bound by the constructor "Pair".
 |}]
 

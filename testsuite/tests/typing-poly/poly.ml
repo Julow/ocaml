@@ -600,8 +600,8 @@ Line 5, characters 24-28:
 5 | let f3 f = f#id 1, f#id true
                             ^^^^
 Error: This expression should not be a boolean literal, the expected type is
-       "int" because it is the argument "1" in a function application of type
-         "int -> 'a"
+       "int" because it is the argument "1" the application application
+       of the function "f#id".
 |}];;
 let f4 f = ignore(f : id); f#id 1, f#id true
 ;;

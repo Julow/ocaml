@@ -2,8 +2,8 @@ File "main.ml", line 1, characters 14-17:
 1 | let _ = A.a = B.b
                   ^^^
 Error: The value B.b has type M.b but an expression was expected of type 
-       M.a because it is the argument 2 in a function application of type
-         M.a -> M.a -> bool
+       M.a because it is the argument 2 the application application
+       of the function (=).
        Type M.b is abstract because no corresponding cmi file was found
        in path.
        Type M.a is abstract because no corresponding cmi file was found

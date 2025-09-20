@@ -13,8 +13,8 @@ Line 2, characters 42-43:
                                               ^
 Error: The value "s" has type "'a list" but an expression was expected of type
          "'a t" = "'a"
-       because it is the argument "2" in a function application of type
-         "'a list -> 'a t -> 'a"
+       because it is the argument "2" the application application
+       of the function "g".
        The type variable "'a" occurs inside "'a list"
 |}];;
 
@@ -25,8 +25,8 @@ Line 1, characters 42-43:
                                               ^
 Error: The value "s" has type "'a * 'b" but an expression was expected of type
          "'a t" = "'a"
-       because it is the argument "2" in a function application of type
-         "'a * 'b -> 'a t -> 'a"
+       because it is the argument "2" the application application
+       of the function "g".
        The type variable "'a" occurs inside "'a * 'b"
 |}];;
 

@@ -148,7 +148,7 @@ Line 2, characters 10-15:
               ^^^^^
 Error: This expression has type "int -> int"
        but an expression was expected of type "int"
-       because it is the argument "1" in a function application of type
-         "int -> int"
+       because it is the argument "1" the application application
+       of the function "g".
 Hint: This function application is partial, maybe some arguments are missing.
 |}]

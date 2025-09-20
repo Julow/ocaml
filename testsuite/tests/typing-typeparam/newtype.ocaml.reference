@@ -9,14 +9,14 @@ Line 2, characters 32-33:
 2 | let f x (type a) (y : a) = (x = y);; (* Fails *)
                                     ^
 Error: The value y has type a but an expression was expected of type 'a
-       because it is the argument 2 in a function application of type
-         'a -> 'a -> bool
+       because it is the argument 2 the application application
+       of the function (=).
        The type constructor a would escape its scope
 Line 3, characters 53-54:
 3 |   method n : 'a -> 'a = fun (type g) (x:g) -> self#m x
                                                          ^
 Error: The value x has type g but an expression was expected of type 'a
-       because it is the argument 1 in a function application of type
-         'a -> 'a
+       because it is the argument 1 the application application
+       of the function self#m.
        The type constructor g would escape its scope
 

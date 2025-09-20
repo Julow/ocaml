@@ -49,7 +49,6 @@ Line 3, characters 21-22:
 Error: The value "s" has type "(module Scalar with type t = s)"
        but an expression was expected of type
          "(module Vector_space with type scalar = 'a and type t = 'b)"
-       because it is the argument "1" in a function application of type
-         "(module Vector_space with type scalar = 'a and type t = 'b) ->
-         'a -> ('b, 'b) Linear_map.t"
+       because it is the argument "1" the application application
+       of the function "Linear_map.scale".
 |}];;

@@ -13,7 +13,7 @@ Line 1, characters 54-58:
                                                           ^^^^
 Error: The value "self" has type "< .. >" but an expression was expected of type
          "<  >"
-       because it is the argument "1" in a function application of type
-         "<  > -> unit"
+       because it is the argument "1" the application application
+       of the function "is_empty".
        Self type cannot be unified with a closed object type
 |}]

@@ -543,8 +543,8 @@ Line 4, characters 46-48:
                                                   ^^
 Error: This expression has type "int option"
        but an expression was expected of type "a option"
-       because it is the argument "2" in a function application of type
-         "a option ref -> a option -> unit"
+       because it is the argument "2" the application application
+       of the function "(:=)".
        Type "int" is not compatible with type "a" = "int"
        This instance of "int" is ambiguous:
        it would escape the scope of its equation

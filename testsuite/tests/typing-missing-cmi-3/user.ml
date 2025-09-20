@@ -35,8 +35,8 @@ Line 1, characters 19-20:
 Error: The value "x" has type "(module Original.T)"
        but an expression was expected of type
          "(module Original.T with type t = int)"
-       because it is the argument "1" in a function application of type
-         "(module Original.T with type t = int) -> unit"
+       because it is the argument "1" the application application
+       of the function "f".
 |}]
 
 let () = Middle.f (module struct end)
