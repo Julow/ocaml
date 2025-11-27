@@ -7174,8 +7174,7 @@ let report_type_expected_explanation expl =
   | When_guard ->
       because "in a when-guard"
   | Argument_of_function { arg_number; funct } ->
-      because "the argument %a of the application of@ %a."
-        (Style.as_inline_code Format_doc.pp_print_int) (arg_number + 1)
+      because "the argument %d of the application of@ %a." (arg_number + 1)
         (report_this_texp ~capitalized:false (Some "function")) funct
 
 let report_type_expected_explanation_opt expl =
