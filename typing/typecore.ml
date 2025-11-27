@@ -7044,8 +7044,7 @@ let report_this_pexp ?(capitalized=true) denom ppf exp =
     | None, Some exp -> pp_exp_denom ppf exp
     | None, None -> fprintf ppf "expression"
   in
-  let nexp = Option.bind exp Pprintast.Doc.nominal_exp in
-  match nexp with
+  match Option.bind exp Pprintast.Doc.nominal_exp with
   | Some nexp ->
       let the = if capitalized then "The" else "the" in
       fprintf ppf "%s %t %a" the denom (Style.as_inline_code pp_doc) nexp
@@ -7151,7 +7150,7 @@ let report_pattern_type_clash_hints pat diff =
   | _ -> []
 
 let report_type_expected_explanation expl =
-  let because expl_str = doc_printf ("@ because it is " ^^ expl_str) in
+  let because ?(sub=[]) expl_str = kdoc_printf (fun msg -> msg, sub) ("@ because it is " ^^ expl_str) in
   match expl with
   | If_conditional ->
       because "in the condition of an if-statement"
@@ -7174,12 +7173,17 @@ let report_type_expected_explanation expl =
   | When_guard ->
       because "in a when-guard"
   | Argument_of_function { arg_number; funct } ->
-      because "the argument %d of the application of@ %a." (arg_number + 1)
+      let sub =
+        [ Location.msg ~loc:funct.exp_loc "%a, which has type@;<1 2>%a."
+            (report_this_texp (Some "function")) funct
+            (Style.as_inline_code Printtyp.type_expr) funct.exp_type ]
+      in
+      because ~sub "the argument %d of the application of@ %a." (arg_number + 1)
         (report_this_texp ~capitalized:false (Some "function")) funct
 
 let report_type_expected_explanation_opt expl =
   match expl with
-  | None -> Format_doc.Doc.empty
+  | None -> Format_doc.Doc.empty, []
   | Some expl -> report_type_expected_explanation expl
 
 let report_unification_error ~loc ?sub env err
@@ -7287,9 +7291,10 @@ let report_error ~loc env = function
   | Expr_type_clash (err, explanation, exp) ->
       let diff = type_clash_of_trace err.trace in
       let sub = report_expr_type_clash_hints env exp diff explanation in
+      let type_expected_explanation, sub' = report_type_expected_explanation_opt explanation in
+      let sub = sub @ sub' in
       report_unification_error ~loc ~sub env err
-        ~type_expected_explanation:
-          (report_type_expected_explanation_opt explanation)
+        ~type_expected_explanation
         (msg "%a has type" (report_this_pexp None) exp)
         (msg "but an expression was expected of type");
   | Function_arity_type_clash {
@@ -7389,9 +7394,12 @@ let report_error ~loc env = function
              (Style.as_inline_code Printtyp.type_path) type_path
              (spellcheck name.txt valid_names)
          else
-           let intro ppf = Fmt.fprintf ppf "@[%s type@;<1 2>%a%a@]@\n"
-             eorp (Style.as_inline_code Printtyp.type_expr) ty
-             pp_doc (report_type_expected_explanation_opt explanation)
+           let explanation_msg, sub =
+             report_type_expected_explanation_opt explanation in
+           let intro ppf =
+             Fmt.fprintf ppf "@[%s type@;<1 2>%a%a@]@\n"
+               eorp (Style.as_inline_code Printtyp.type_expr) ty
+               pp_doc explanation_msg
            in
            let main =
              Fmt.doc_printf "@{<ralign>There is no %s @}%a within type %a"
@@ -7401,10 +7409,10 @@ let report_error ~loc env = function
            in
            let main, sub =
              match spellcheck name.txt valid_names with
-             | None -> main, []
+             | None -> main, sub
              | Some hint ->
                  let main, hint = Misc.align_error_hint ~main ~hint in
-                 main, [Location.mknoloc hint]
+                 main, sub @ [Location.mknoloc hint]
            in
            Location.errorf ~loc ~sub "%t%a" intro pp_doc main
        )
@@ -7427,10 +7435,10 @@ let report_error ~loc env = function
   | Invalid_format msg ->
       Location.errorf ~loc "%s" msg
   | Not_an_object (ty, explanation) ->
-    Location.errorf ~loc
-      "This expression is not an object;@ it has type %a%a"
-      (Style.as_inline_code Printtyp.type_expr) ty
-      pp_doc (report_type_expected_explanation_opt explanation)
+      let msg, sub = report_type_expected_explanation_opt explanation in
+      Location.errorf ~loc ~sub
+        "This expression is not an object;@ it has type %a%a"
+        (Style.as_inline_code Printtyp.type_expr) ty pp_doc msg
   | Undefined_method (ty, me, valid_methods) ->
      Printtyp.wrap_printing_env ~error:true env (fun () ->
           let intro ppf =
@@ -7499,17 +7507,17 @@ let report_error ~loc env = function
              ]
          )
   | Not_a_function (ty, explanation) ->
-      Location.errorf ~loc
+      let msg, sub = report_type_expected_explanation_opt explanation in
+      Location.errorf ~loc ~sub
         "This expression should not be a function,@ \
          the expected type is@ %a%a"
-        (Style.as_inline_code Printtyp.type_expr) ty
-        pp_doc (report_type_expected_explanation_opt explanation)
+        (Style.as_inline_code Printtyp.type_expr) ty pp_doc msg
   | Too_many_arguments (ty, explanation) ->
-      Location.errorf ~loc
+      let msg, sub = report_type_expected_explanation_opt explanation in
+      Location.errorf ~loc ~sub
         "This function expects too many arguments,@ \
          it should have type@ %a%a"
-        (Style.as_inline_code Printtyp.type_expr) ty
-        pp_doc (report_type_expected_explanation_opt explanation)
+        (Style.as_inline_code Printtyp.type_expr) ty pp_doc msg
   | Abstract_wrong_label {got; expected; expected_type; explanation} ->
       let label ~long ppf = function
         | Nolabel -> fprintf ppf "unlabeled"
@@ -7523,11 +7531,11 @@ let report_error ~loc env = function
         | Nolabel, _ | _, Nolabel -> true
         | _                       -> false
       in
-      Location.errorf ~loc
+      let msg, sub = report_type_expected_explanation_opt explanation in
+      Location.errorf ~loc ~sub
         "@[<v>@[<2>This function should have type@ %a%a@]@,\
          @[but its first argument is %a@ instead of %s%a@]@]"
-        (Style.as_inline_code Printtyp.type_expr) expected_type
-        pp_doc (report_type_expected_explanation_opt explanation)
+        (Style.as_inline_code Printtyp.type_expr) expected_type pp_doc msg
         (label ~long:true) got
         (if second_long then "being " else "")
         (label ~long:second_long) expected
@@ -7722,11 +7730,11 @@ let report_error ~loc env = function
         | Unit -> "unit literal"
         | Record -> "record"
       in
-      Location.errorf ~loc
+      let msg, sub = report_type_expected_explanation_opt explanation in
+      Location.errorf ~loc ~sub
         "This %s should not be a %s,@ \
          the expected type is@ %a%a"
-        ctx sort (Style.as_inline_code Printtyp.type_expr) ty
-        pp_doc (report_type_expected_explanation_opt explanation)
+        ctx sort (Style.as_inline_code Printtyp.type_expr) ty pp_doc msg
   | Expr_not_a_record_type ty ->
       Location.errorf ~loc
         "This expression has type %a@ \
